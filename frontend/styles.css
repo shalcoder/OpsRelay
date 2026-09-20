@@ -353,10 +353,14 @@ body {
 }
 
 .login-footer-caption {
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
-  max-width: 420px;
+  position: relative;
+  z-index: 2;
+  font-size: 15px;
+  font-weight: 400;
+  color: #ffffff;
+  max-width: 480px;
   line-height: 1.6;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
 }
 
 .login-right-pane {
