@@ -1,0 +1,13 @@
+services:
+  opsrelay:
+    build:
+      context: ..
+      dockerfile: local/Dockerfile
+    environment:
+      OPSRELAY_MODE: local
+      STRANDS_ENABLED: "false"
+      SAGEMAKER_ENABLED: "false"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../data:/app/data

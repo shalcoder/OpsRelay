@@ -1,0 +1,241 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: OpsRelay — Autonomous Factory Decision Intelligence Platform
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 256
+    Environment:
+      Variables:
+        REGION: !Ref AWS::Region
+        MACHINES_TABLE: !Ref MachinesTable
+        ORDERS_TABLE: !Ref OrdersTable
+        RECOMMENDATIONS_TABLE: !Ref RecommendationsTable
+        ALERTS_TABLE: !Ref AlertsTable
+        TELEMETRY_TABLE: !Ref TelemetryTable
+        SNS_TOPIC_ARN: !Ref AlertsTopic
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,PUT,DELETE,OPTIONS'"
+      AllowHeaders: "'Content-Type,Authorization,X-Requested-With'"
+      AllowOrigin: "'*'"
+
+# ─────────────────────────────────────────────────────────────────
+# Parameters
+# ─────────────────────────────────────────────────────────────────
+Parameters:
+  Environment:
+    Type: String
+    Default: prod
+    AllowedValues: [dev, staging, prod]
+    Description: Deployment environment
+
+# ─────────────────────────────────────────────────────────────────
+# Resources
+# ─────────────────────────────────────────────────────────────────
+Resources:
+
+  # ── API Function ─────────────────────────────────────────────
+  OpsRelayApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub opsrelay-api-${Environment}
+      CodeUri: deploy/lambda/
+      Handler: lambda_function.handler
+      Description: OpsRelay main API handler — routes all REST endpoints to DynamoDB
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref MachinesTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref RecommendationsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AlertsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TelemetryTable
+        - SNSPublishMessagePolicy:
+            TopicName: !GetAtt AlertsTopic.TopicName
+      Events:
+        ApiProxy:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /{proxy+}
+            Method: ANY
+        ApiRoot:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /
+            Method: ANY
+
+  # ── API Gateway ───────────────────────────────────────────────
+  OpsRelayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: !Sub opsrelay-api-${Environment}
+      StageName: prod
+      Description: OpsRelay Factory Intelligence REST API
+      TracingEnabled: true
+      MethodSettings:
+        - ResourcePath: "/*"
+          HttpMethod: "*"
+          LoggingLevel: ERROR
+          MetricsEnabled: true
+
+  # ── DynamoDB Tables ───────────────────────────────────────────
+  MachinesTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Sub opsrelay-machines-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: machine_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: machine_id
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: App
+          Value: OpsRelay
+
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Sub opsrelay-orders-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: order_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: order_id
+          KeyType: HASH
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      Tags:
+        - Key: App
+          Value: OpsRelay
+
+  RecommendationsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Sub opsrelay-recommendations-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: rec_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: rec_id
+          KeyType: HASH
+      Tags:
+        - Key: App
+          Value: OpsRelay
+
+  AlertsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Sub opsrelay-alerts-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: alert_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: alert_id
+          KeyType: HASH
+      Tags:
+        - Key: App
+          Value: OpsRelay
+
+  TelemetryTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !Sub opsrelay-telemetry-${Environment}
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: machine_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: machine_id
+          KeyType: HASH
+      Tags:
+        - Key: App
+          Value: OpsRelay
+
+  # ── SNS Topic for Alerts ──────────────────────────────────────
+  AlertsTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub opsrelay-alerts-${Environment}
+      DisplayName: OpsRelay Factory Alerts
+
+  # ── S3 Bucket for Frontend ─────────────────────────────────────
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub opsrelay-frontend-${AWS::AccountId}
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        IgnorePublicAcls: false
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: PublicReadGetObject
+            Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "${FrontendBucket.Arn}/*"
+
+  # ── CloudWatch Log Group ──────────────────────────────────────
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/opsrelay-api-${Environment}
+      RetentionInDays: 30
+
+# ─────────────────────────────────────────────────────────────────
+# Outputs
+# ─────────────────────────────────────────────────────────────────
+Outputs:
+  ApiUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${OpsRelayApi}.execute-api.${AWS::Region}.amazonaws.com/prod"
+    Export:
+      Name: OpsRelayApiUrl
+
+  FrontendUrl:
+    Description: S3 static website URL
+    Value: !Sub "http://${FrontendBucket}.s3-website.${AWS::Region}.amazonaws.com"
+    Export:
+      Name: OpsRelayFrontendUrl
+
+  MachinesTableName:
+    Description: DynamoDB Machines table name
+    Value: !Ref MachinesTable
+
+  OrdersTableName:
+    Description: DynamoDB Orders table name
+    Value: !Ref OrdersTable
+
+  AlertsTopicArn:
+    Description: SNS Alerts topic ARN
+    Value: !Ref AlertsTopic

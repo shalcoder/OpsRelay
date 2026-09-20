@@ -1,0 +1,342 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: OpsRelay - Zero-ERP Factory Execution Copilot
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 30
+    MemorySize: 512
+    Environment:
+      Variables:
+        OPSRELAY_MODE: cloud
+        AWS_REGION: !Ref AWS::Region
+        OPSRELAY_TABLE_NAME: !Ref OpsRelayTable
+        OPSRELAY_RAW_BUCKET: !Ref RawEventsBucket
+        OPSRELAY_EVENT_BUS: default
+        SAGEMAKER_ENDPOINT_NAME: !Ref SageMakerEndpointName
+        SAGEMAKER_ENABLED: !Ref SageMakerEnabled
+        STRANDS_ENABLED: !Ref StrandsEnabled
+        BEDROCK_MODEL_ID: !Ref BedrockModelId
+        CORS_ORIGINS: !Ref CorsOrigins
+
+Parameters:
+  CorsOrigins:
+    Type: String
+    Default: '*'
+  SageMakerEnabled:
+    Type: String
+    AllowedValues: ['true','false']
+    Default: 'false'
+  SageMakerEndpointName:
+    Type: String
+    Default: ''
+  StrandsEnabled:
+    Type: String
+    AllowedValues: ['true','false']
+    Default: 'false'
+  BedrockModelId:
+    Type: String
+    Default: 'amazon.nova-lite-v1:0'
+
+Resources:
+  OpsRelayUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub '${AWS::StackName}-users'
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 12
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+
+  OpsRelayUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref OpsRelayUserPool
+      ClientName: opsrelay-web
+      GenerateSecret: false
+
+  OpsRelayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      EndpointConfiguration: REGIONAL
+      Cors:
+        AllowMethods: "'GET,POST,OPTIONS'"
+        AllowHeaders: "'Content-Type,Authorization'"
+        AllowOrigin: !Sub "'${CorsOrigins}'"
+
+  OpsRelayTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+
+  RawEventsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  FrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+
+  FrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref FrontendBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Sub '${FrontendBucket.Arn}/*'
+
+  FactoryEventsQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 120
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt FactoryEventsDLQ.Arn
+        maxReceiveCount: 3
+
+  FactoryEventsDLQ:
+    Type: AWS::SQS::Queue
+
+  FactoryEventsQueuePolicy:
+    Type: AWS::SQS::QueuePolicy
+    Properties:
+      Queues:
+        - !Ref FactoryEventsQueue
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: events.amazonaws.com
+            Action: sqs:SendMessage
+            Resource: !GetAtt FactoryEventsQueue.Arn
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt FactoryEventRule.Arn
+
+  FactoryEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Routes normalized OpsRelay factory events to SQS for processing.
+      EventPattern:
+        source:
+          - opsrelay.ingestion
+        detail-type:
+          - FactoryEvent
+      Targets:
+        - Arn: !GetAtt FactoryEventsQueue.Arn
+          Id: OpsRelayFactoryEventsQueue
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../api/
+      Handler: lambda_api.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OpsRelayTable
+        - S3CrudPolicy:
+            BucketName: !Ref RawEventsBucket
+        - Statement:
+            - Effect: Allow
+              Action: sagemaker:InvokeEndpoint
+              Resource: !Sub 'arn:${AWS::Partition}:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint/*'
+            - Effect: Allow
+              Action: events:PutEvents
+              Resource: !Sub 'arn:${AWS::Partition}:events:${AWS::Region}:${AWS::AccountId}:event-bus/default'
+            - Effect: Allow
+              Action:
+                - bedrock:InvokeModel
+                - bedrock:InvokeModelWithResponseStream
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+              Resource: '*'
+      Events:
+        Health:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /health
+            Method: get
+        Dashboard:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /dashboard
+            Method: get
+        Orders:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /orders
+            Method: get
+        Order:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /orders/{id}
+            Method: get
+        Machines:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /machines
+            Method: get
+        Risk:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /risk/{id}
+            Method: get
+        Events:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /events
+            Method: get
+        Ingest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /events
+            Method: post
+        Recalculate:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /risk/recalculate
+            Method: post
+        Agent:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /agent/query
+            Method: post
+        Recommendations:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /recommendations
+            Method: get
+        Actions:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /actions
+            Method: get
+        Execute:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /actions
+            Method: post
+        Audit:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OpsRelayApi
+            Path: /audit
+            Method: get
+
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../api/
+      Handler: lambda_processor.handler
+      Timeout: 60
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OpsRelayTable
+        - Statement:
+            - Effect: Allow
+              Action: sagemaker:InvokeEndpoint
+              Resource: !Sub 'arn:${AWS::Partition}:sagemaker:${AWS::Region}:${AWS::AccountId}:endpoint/*'
+      Events:
+        FactoryQueue:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt FactoryEventsQueue.Arn
+            BatchSize: 5
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+
+  OpsRelayDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardName: !Sub '${AWS::StackName}-dashboard'
+      DashboardBody: !Sub |
+        {
+          "widgets": [
+            {"type":"metric","x":0,"y":0,"width":12,"height":6,"properties":{"title":"API Invocations","view":"timeSeries","region":"${AWS::Region}","metrics":[["AWS/ApiGateway","Count","ApiName","${OpsRelayApi}",{"stat":"Sum"}]]}},
+            {"type":"metric","x":12,"y":0,"width":12,"height":6,"properties":{"title":"Processor Lambda Duration","view":"timeSeries","region":"${AWS::Region}","metrics":[["AWS/Lambda","Duration","FunctionName","${ProcessorFunction}",{"stat":"Average"}]]}}
+          ]
+        }
+
+Outputs:
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !Sub 'https://${OpsRelayApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/prod'
+  FrontendBucket:
+    Description: Frontend S3 bucket name
+    Value: !Ref FrontendBucket
+  FrontendWebsiteUrl:
+    Description: Frontend website URL
+    Value: !GetAtt FrontendBucket.WebsiteURL
+  TableName:
+    Value: !Ref OpsRelayTable
+  CognitoUserPoolId:
+    Value: !Ref OpsRelayUserPool
+  CognitoClientId:
+    Value: !Ref OpsRelayUserPoolClient
+  QueueUrl:
+    Value: !Ref FactoryEventsQueue
+  QueueArn:
+    Value: !GetAtt FactoryEventsQueue.Arn
+  RawEventsBucket:
+    Value: !Ref RawEventsBucket

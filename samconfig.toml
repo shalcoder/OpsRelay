@@ -1,0 +1,25 @@
+version = 0.1
+
+[default]
+[default.global.parameters]
+stack_name = "opsrelay-stack"
+
+[default.build.parameters]
+use_container = true
+parallel = true
+
+[default.validate.parameters]
+lint = true
+
+[default.deploy.parameters]
+stack_name          = "opsrelay-stack"
+s3_prefix           = "opsrelay"
+region              = "ap-south-1"
+capabilities        = "CAPABILITY_IAM"
+confirm_changeset   = false
+fail_on_empty_changeset = false
+resolve_s3          = true
+parameter_overrides = "Environment=prod"
+
+[default.sync.parameters]
+watch = true
