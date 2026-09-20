@@ -53,6 +53,36 @@
           <button type="submit" class="login-btn" id="loginSubmitBtn">Sign In</button>
         </form>
 
+        <form id="registerForm" class="login-form hidden">
+          <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="registerEmail" placeholder="you@company.com" required />
+          </div>
+          <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="registerPassword" minlength="8" required />
+          </div>
+          <div class="input-group">
+            <label>Confirm password</label>
+            <input type="password" id="registerPasswordConfirm" minlength="8" required />
+          </div>
+          <button type="submit" class="login-btn" id="registerSubmitBtn">Create account</button>
+          <button type="button" class="login-text-btn" id="backToLoginBtn">Back to sign in</button>
+        </form>
+
+        <form id="confirmForm" class="login-form hidden">
+          <div class="input-group">
+            <label>Verification code</label>
+            <input type="text" id="confirmCode" inputmode="numeric" autocomplete="one-time-code" required />
+          </div>
+          <button type="submit" class="login-btn" id="confirmSubmitBtn">Verify email</button>
+          <button type="button" class="login-text-btn" id="backToLoginFromConfirmBtn">Back to sign in</button>
+        </form>
+
+        <p class="login-bottom-text" id="createAccountPrompt">
+          New to OpsRelay? <a href="#" id="createAccountLink">Create an account</a>
+        </p>
+
         <p class="login-bottom-text">
           Don't have an account? <a href="#" onclick="toast('Please contact your plant administrator for credentials', 'info'); return false;">Contact your admin</a>
         </p>
