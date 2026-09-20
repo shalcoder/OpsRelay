@@ -17,6 +17,7 @@ env:
   S3_BUCKET: opsrelay-frontend-704932818996
   API_FUNCTION_NAME: opsrelay-api
   API_URL: https://4q0wc7pbk4.execute-api.ap-south-1.amazonaws.com/prod
+  AMPLIFY_APP_ID: d1i1uhvgsd7rvo
   DEPLOY_ROLE_ARN: arn:aws:iam::704932818996:role/opsrelay-github-deploy-role
 
 jobs:
@@ -139,17 +140,30 @@ jobs:
             --include "*.html" \
             --cache-control "no-cache, no-store, must-revalidate"
 
+      - name: Deploy Frontend to AWS Amplify (CloudFront CDN)
+        run: |
+          cd frontend
+          zip -r ../frontend.zip .
+          cd ..
+          DEPLOY_INFO=$(aws amplify create-deployment --app-id ${{ env.AMPLIFY_APP_ID }} --branch-name main --region ${{ env.AWS_REGION }})
+          JOB_ID=$(echo "$DEPLOY_INFO" | jq -r '.jobId')
+          UPLOAD_URL=$(echo "$DEPLOY_INFO" | jq -r '.zipUploadUrl')
+          curl -s -T frontend.zip "$UPLOAD_URL" -H "Content-Type: application/zip"
+          aws amplify start-deployment --app-id ${{ env.AMPLIFY_APP_ID }} --branch-name main --job-id "$JOB_ID" --region ${{ env.AWS_REGION }}
+          rm -f frontend.zip
+
       - name: Print deployment summary
         run: |
           echo "========================================"
           echo "  OpsRelay Deployment Complete"
           echo "========================================"
-          echo "  API URL : ${{ needs.deploy-backend.outputs.api-url }}"
-          echo "  Frontend: http://${{ env.S3_BUCKET }}.s3-website.${{ env.AWS_REGION }}.amazonaws.com"
+          echo "  API Gateway: ${{ needs.deploy-backend.outputs.api-url }}"
+          echo "  Amplify SSL: https://main.${{ env.AMPLIFY_APP_ID }}.amplifyapp.com"
+          echo "  S3 Endpoint: http://${{ env.S3_BUCKET }}.s3-website.${{ env.AWS_REGION }}.amazonaws.com"
           echo "========================================"
 
   # ─────────────────────────────────────────────────────────
-  # JOB 4: Smoke Test — verify the live API responds
+  # JOB 4: Smoke Test — verify live endpoints respond
   # ─────────────────────────────────────────────────────────
   smoke-test:
     name: Smoke Test
@@ -158,7 +172,12 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
-      - name: Smoke test - frontend endpoint
+      - name: Smoke test - HTTPS CloudFront (Amplify)
+        run: |
+          curl -sf "https://main.${{ env.AMPLIFY_APP_ID }}.amplifyapp.com/" > /dev/null
+          echo "Amplify CloudFront HTTPS smoke test PASSED"
+
+      - name: Smoke test - S3 website endpoint
         run: |
           curl -sf "http://${{ env.S3_BUCKET }}.s3-website.${{ env.AWS_REGION }}.amazonaws.com/" > /dev/null
-          echo "Smoke test PASSED"
+          echo "S3 HTTP smoke test PASSED"
