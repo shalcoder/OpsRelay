@@ -274,6 +274,12 @@ function showLandingPage(show) {
 async function load() {
   try {
     state.data = await api("/dashboard");
+    if (state.data?.orders?.length && (!state.selectedOrder || state.selectedOrder === "ORD-00125")) {
+      state.selectedOrder = state.data.orders[0].id;
+    }
+    if (state.data?.machines?.length && (!state.selectedMachine || state.selectedMachine === "M-001")) {
+      state.selectedMachine = state.data.machines[0].id;
+    }
     renderCurrentView();
   } catch (e) {
     toast(`API Sync: ${e.message}`, "warn");
