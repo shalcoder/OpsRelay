@@ -1,0 +1,1266 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpsRelay — Autonomous Factory Decision Intelligence</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <!-- Production config — overrides local API URL when deployed to S3 -->
+  <script src="config.js" onerror="window.OPSR_CONFIG=window.OPSR_CONFIG||{apiBaseUrl:'/api'}"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-theme="enterprise">
+
+  <!-- Screen 1: Login / Sign In Split Screen -->
+  <div id="loginScreen" class="login-screen hidden">
+    <div class="login-left-pane">
+      <div class="login-left-content">
+        <div class="login-brand">
+          <img src="assets/logo.svg" alt="OpsRelay Logo" class="login-brand-logo-img" />
+          <span class="login-brand-title">OpsRelay</span>
+        </div>
+        <h1 class="login-hero-headline">
+          <span>Smarter Operations</span>
+          <span>Safer Machines</span>
+          <span class="accent">Happier Customers</span>
+        </h1>
+      </div>
+      <div class="login-footer-caption">
+        AI-powered decision intelligence for modern operations. Real-time factory telemetry, generative root cause diagnosis, and autonomous SLA preservation.
+      </div>
+    </div>
+    <div class="login-right-pane">
+      <div class="login-card">
+        <div style="margin-bottom: 22px;">
+          <img src="assets/logo.svg" alt="OpsRelay Logo" style="width: 44px; height: 44px;" />
+        </div>
+        <h2>Welcome back</h2>
+        <p class="login-card-subtitle">Sign in to your OpsRelay account</p>
+
+        <form id="loginForm" class="login-form">
+          <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="loginEmail" value="judge@opsrelay.com" placeholder="judge@opsrelay.com" required />
+          </div>
+          <div class="input-group">
+            <div class="login-pass-row">
+              <label style="margin-bottom:0;">Password</label>
+              <a href="#" class="forgot-link" onclick="toast('Reset code dispatched via Amazon Cognito SES', 'info'); return false;">Forgot password?</a>
+            </div>
+            <input type="password" id="loginPassword" value="OpsRelay2026!Judge" placeholder="••••••••••••" required />
+          </div>
+
+          <button type="submit" class="login-btn" id="loginSubmitBtn">Sign In</button>
+        </form>
+
+        <p class="login-bottom-text">
+          Don't have an account? <a href="#" onclick="toast('Please contact your plant administrator for credentials', 'info'); return false;">Contact your admin</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enterprise Landing Page (Matching Uploaded Specification) -->
+  <section id="landingPage" class="landing-page-wrap">
+    <!-- Navbar -->
+    <header class="landing-nav">
+      <div class="landing-nav-container">
+        <a href="#landing" class="landing-brand" id="landingBrandLogoLink">
+          <img src="assets/logo.svg" alt="OpsRelay Logo" class="landing-logo-img" />
+          <span class="landing-brand-text">OpsRelay</span>
+        </a>
+
+        <nav class="landing-nav-links">
+          <a href="#product" class="landing-nav-link" id="navLinkProduct">Product</a>
+          <a href="#solutions" class="landing-nav-link" id="navLinkSolutions">Solutions</a>
+          <a href="#resources" class="landing-nav-link" id="navLinkResources">Resources</a>
+          <a href="#pricing" class="landing-nav-link" id="navLinkPricing">Pricing</a>
+        </nav>
+
+        <div class="landing-nav-actions">
+          <button class="landing-btn-primary" id="landingNavJudgeBtn" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-size: 13px; font-weight: 600; padding: 8px 16px; border-radius: 8px; box-shadow: 0 0 16px rgba(16,185,129,0.35); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+            <svg style="width:14px;height:14px;fill:currentColor;" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span>Judge Demo Access</span>
+          </button>
+          <button class="landing-btn-subtle" id="landingNavSignInBtn">Sign In</button>
+          <button class="landing-btn-primary" id="landingNavGetStartedBtn">Get Started</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <main class="landing-hero-section">
+      <div class="landing-hero-container">
+        <div class="landing-hero-left">
+          <div class="hero-badge-pill">
+            <span class="badge-dot"></span>
+            <span>AI-Powered Factory Operations</span>
+          </div>
+
+          <h1 class="landing-hero-title">
+            <span>Smarter Factories</span>
+            <span class="gradient-accent">Happier Customers</span>
+          </h1>
+
+          <h2 class="landing-hero-subtitle">Predict. Prevent. Perform.</h2>
+
+          <p class="landing-hero-desc">
+            Real-time intelligence, AI agents, and actionable insights for modern manufacturing.
+          </p>
+
+          <div class="landing-hero-ctas">
+            <button class="landing-btn-primary landing-btn-hero" id="heroGetStartedBtn">
+              Get Started Free
+            </button>
+            <button class="landing-btn-secondary landing-btn-hero" id="heroWatchDemoBtn">
+              <svg viewBox="0 0 24 24" class="play-icon"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon></svg>
+              <span>Watch Demo</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="landing-hero-right">
+          <div class="hero-image-card">
+            <img src="assets/factory_hero_3d.jpg" alt="OpsRelay Autonomous Smart Factory" class="hero-factory-img" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Metrics Strip (30%, 25%, 40%, 500+) -->
+      <div class="landing-metrics-strip">
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-val">30%</div>
+            <div class="metric-lbl">Lower Downtime</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">25%</div>
+            <div class="metric-lbl">Higher Productivity</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">40%</div>
+            <div class="metric-lbl">Faster Recovery</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">500+</div>
+            <div class="metric-lbl">Factories Trust OpsRelay</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logo Cloud: Trusted by leading manufacturers -->
+      <div class="landing-logos-strip">
+        <div class="logos-caption">Trusted by leading manufacturers</div>
+        <div class="logos-row">
+          <!-- TATA -->
+          <div class="partner-logo" title="Tata Group">
+            <svg viewBox="0 0 120 40" class="brand-svg">
+              <ellipse cx="60" cy="13" rx="14" ry="11" fill="none" stroke="currentColor" stroke-width="2.5" />
+              <path d="M52 10h16M60 10v10" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+              <text x="60" y="36" font-family="'Inter', -apple-system, sans-serif" font-weight="800" font-size="12" letter-spacing="4" fill="currentColor" text-anchor="middle">TATA</text>
+            </svg>
+          </div>
+          <!-- BOSCH -->
+          <div class="partner-logo" title="Bosch">
+            <svg viewBox="0 0 140 40" class="brand-svg">
+              <circle cx="24" cy="20" r="13" fill="none" stroke="currentColor" stroke-width="2.5"/>
+              <rect x="21.5" y="10" width="5" height="20" rx="1.5" fill="currentColor"/>
+              <text x="82" y="27" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="18" letter-spacing="2" fill="currentColor" text-anchor="middle">BOSCH</text>
+            </svg>
+          </div>
+          <!-- SIEMENS -->
+          <div class="partner-logo" title="Siemens">
+            <svg viewBox="0 0 150 40" class="brand-svg">
+              <text x="75" y="27" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="19" letter-spacing="3" fill="#00646E" text-anchor="middle">SIEMENS</text>
+            </svg>
+          </div>
+          <!-- Schneider Electric -->
+          <div class="partner-logo" title="Schneider Electric">
+            <svg viewBox="0 0 180 40" class="brand-svg">
+              <path d="M18 10c0 0-6 6-6 12s4 10 9 10c6 0 9-5 9-10 0-4-3-8-6-10 1 3 0 6-2 7-1 1-3 0-3-2 0-3 2-5 3-7z" fill="#009E4D"/>
+              <text x="100" y="20" font-family="'Inter', -apple-system, sans-serif" font-weight="700" font-size="13.5" letter-spacing="0.5" fill="currentColor" text-anchor="middle">Schneider</text>
+              <text x="100" y="32" font-family="'Inter', -apple-system, sans-serif" font-weight="600" font-size="9.5" letter-spacing="2" fill="#009E4D" text-anchor="middle">Electric</text>
+            </svg>
+          </div>
+          <!-- ABB -->
+          <div class="partner-logo" title="ABB">
+            <svg viewBox="0 0 110 40" class="brand-svg">
+              <text x="55" y="28" font-family="'Inter', -apple-system, sans-serif" font-weight="900" font-size="23" letter-spacing="2" fill="#FF000F" text-anchor="middle">ABB</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </main>
+  </section>
+
+  <!-- Interactive Watch Demo Modal -->
+  <div id="demoModal" class="demo-modal-backdrop hidden">
+    <div class="demo-modal-dialog">
+      <div class="demo-modal-header">
+        <div class="demo-modal-badge">
+          <span class="live-pulse"></span>
+          <span>Interactive Simulation</span>
+        </div>
+        <h3>OpsRelay Autonomous Factory Decision Engine</h3>
+        <button class="demo-close-btn" id="closeDemoModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="demo-modal-body">
+        <div class="demo-screen-mock">
+          <div class="demo-banner">
+            <span class="live-dot"></span> <strong>Live Telemetry Stream:</strong> Packaging Line A1 bearing vibration anomaly detected (+0.8 mm/s drift).
+          </div>
+          <div class="demo-flow-grid">
+            <div class="demo-step active">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>IoT Sensor Telemetry Ingest</h4>
+                <p>High-frequency vibration stream flagged thermal & harmonic bearing divergence at 14:02 UTC.</p>
+              </div>
+            </div>
+            <div class="demo-step active">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>SageMaker Predictive Inference</h4>
+                <p>Identified 84% failure probability within 6 hours. Predicted customer order delay on ORD-00125.</p>
+              </div>
+            </div>
+            <div class="demo-step active">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>Autonomous Action Recommendation</h4>
+                <p>Rerouted ORD-00125 via Dallas facility (36h saved) and pre-dispatched preventive maintenance crew.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-actions">
+          <button class="landing-btn-primary" id="demoLaunchAppBtn" style="padding: 10px 24px; font-size: 14px;">Launch Full Operations Workspace</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application Shell -->
+  <div class="app-shell" id="appShell">
+    <!-- Sidebar Navigation -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-header">
+        <img src="assets/logo.svg" alt="OpsRelay Logo" class="sidebar-brand-logo-img" />
+        <span class="brand-name">OpsRelay</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- Exact Navigation Items from UI -->
+        <button class="nav-item active" data-view="dashboard">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9"></rect><rect x="14" y="3" width="7" height="5"></rect><rect x="14" y="12" width="7" height="9"></rect><rect x="3" y="16" width="7" height="5"></rect></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="machines">
+          <svg viewBox="0 0 24 24"><path d="M4 14a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6z"></path><rect x="6" y="2" width="12" height="8" rx="1"></rect></svg>
+          <span>Machines</span>
+          <span class="nav-badge-pill" id="machineCountPill">11</span>
+        </button>
+        <button class="nav-item" data-view="orders">
+          <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+          <span>Orders</span>
+          <span class="nav-badge-pill" id="orderCountPill">12</span>
+        </button>
+        <button class="nav-item" data-view="alerts">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          <span>Alerts</span>
+          <span class="nav-badge-pill" style="background-color: var(--status-critical); color:#fff;" id="alertCountPill">12</span>
+        </button>
+        <button class="nav-item" data-view="ai-insights">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+          <span>AI Insights</span>
+        </button>
+        <button class="nav-item" data-view="approvals">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <span>Approvals</span>
+          <span class="nav-badge-pill" id="approvalCountPill">4</span>
+        </button>
+        <button class="nav-item" data-view="reports">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <span>Reports</span>
+        </button>
+        <button class="nav-item" data-view="settings">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-mini-card" id="userMiniCard">
+          <div class="avatar-circle">AC</div>
+          <div class="user-mini-meta">
+            <div class="user-mini-name">Alex Chen</div>
+            <div class="user-mini-role">Operations Manager</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="search-box-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input type="text" class="search-input" id="globalSearchInput" placeholder="Search anything..." />
+        </div>
+
+        <div class="top-bar-actions">
+          <button class="topbar-landing-btn" id="topbarLandingBtn" title="View Marketing Landing Page">
+            <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>Landing Page</span>
+          </button>
+          <!-- Theme Switcher (Screens 13-20) -->
+          <select class="theme-select" id="themeSelect">
+            <option value="enterprise">Enterprise (Default)</option>
+            <option value="dark">Dark Theme (#13)</option>
+            <option value="minimal">Minimal Theme (#14)</option>
+            <option value="high-contrast">High-Contrast (#15)</option>
+            <option value="forest">Forest Theme (#16)</option>
+            <option value="ocean">Ocean Theme (#17)</option>
+            <option value="sunset">Sunset Theme (#18)</option>
+            <option value="purple">Purple Theme (#19)</option>
+            <option value="monochrome">Monochrome (#20)</option>
+          </select>
+
+          <!-- Notification Bell Icon (Screen 11) -->
+          <button class="icon-btn" id="notificationsBellBtn" title="Notifications">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            <span class="icon-badge"></span>
+          </button>
+
+          <!-- User Profile Pill -->
+          <div class="top-user-pill" id="topUserPill">
+            <div class="avatar-circle" style="width:28px;height:28px;font-size:11px;">AC</div>
+            <div class="top-user-meta">
+              <span class="top-user-name">Alex Chen</span>
+              <span class="top-user-sub">Operations Manager</span>
+            </div>
+            <svg style="width:14px;height:14px;stroke:var(--text-muted);fill:none;stroke-width:2;" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEW 2: Dashboard (Screen 2) -->
+      <section class="content-body" id="viewDashboard">
+        <div class="dashboard-header">
+          <h1 class="dashboard-title">Good morning, Alex</h1>
+          <p class="dashboard-subtitle">Here's what's happening with your operations today.</p>
+        </div>
+
+        <!-- 4 KPI Stat Cards -->
+        <div class="kpi-grid-4">
+          <div class="kpi-card">
+            <div class="kpi-card-top">
+              <svg viewBox="0 0 24 24"><path d="M4 14a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6z"></path></svg>
+              <span>Machines</span>
+            </div>
+            <div class="kpi-card-value" id="kpiMachines">248</div>
+            <div class="kpi-card-badges">
+              <span class="trend-badge positive">
+                <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                +12%
+              </span>
+              <span class="trend-badge positive">+2%</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-card-top">
+              <svg viewBox="0 0 24 24" style="stroke:var(--status-critical);"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>Active Alerts</span>
+            </div>
+            <div class="kpi-card-value" id="kpiAlerts">12</div>
+            <div class="kpi-card-badges">
+              <span class="trend-badge negative">
+                <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                -3%
+              </span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-card-top">
+              <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path></svg>
+              <span>Orders in Transit</span>
+            </div>
+            <div class="kpi-card-value" id="kpiTransit">1,245</div>
+            <div class="kpi-card-badges">
+              <span class="trend-badge positive">
+                <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                +18%
+              </span>
+              <span class="trend-badge positive">+71.2%</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-card-top">
+              <svg viewBox="0 0 24 24" style="stroke:var(--status-healthy);"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              <span>On-Time Delivery</span>
+            </div>
+            <div class="kpi-card-value" id="kpiDelivery">96.8%</div>
+            <div class="kpi-card-badges">
+              <span class="trend-badge positive">
+                <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                +14.5%
+              </span>
+              <span class="trend-badge positive">+11.2%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Grid: Machine Health Trend & Recent Alerts -->
+        <div class="dashboard-grid-2">
+          <!-- Machine Health Trend Line Chart -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title">Machine Health Trend</h3>
+              <div class="panel-legend">
+                <span><span class="legend-dot healthy"></span>Healthy</span>
+                <span><span class="legend-dot warning"></span>Warning</span>
+                <span><span class="legend-dot critical"></span>Critical</span>
+              </div>
+            </div>
+            <div class="chart-container" id="machineTrendChartContainer">
+              <!-- Rendered dynamically by app.js via SVG -->
+            </div>
+          </div>
+
+          <!-- Recent Alerts Card -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title">Recent Alerts</h3>
+              <button class="forgot-link" onclick="switchView('alerts')">View all</button>
+            </div>
+            <div class="alerts-list" id="dashboardRecentAlerts">
+              <!-- Filled dynamically by app.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 3: Machines Overview (Screen 3) -->
+      <section class="content-body hidden" id="viewMachines">
+        <div class="page-title-row">
+          <h1 class="page-title">Machines</h1>
+          <button class="btn-primary-action" id="addMachineBtn">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Add Machine</span>
+          </button>
+        </div>
+
+        <!-- 4 Stat Summary Pills -->
+        <div class="stat-pills-row">
+          <div class="summary-stat-box">
+            <div class="summary-stat-icon blue">
+              <svg viewBox="0 0 24 24"><path d="M4 14a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-6z"></path></svg>
+            </div>
+            <div>
+              <div class="summary-stat-val" id="machStatTotal">248</div>
+              <div class="summary-stat-lbl">Total Machines</div>
+            </div>
+          </div>
+          <div class="summary-stat-box">
+            <div class="summary-stat-icon green">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div>
+              <div class="summary-stat-val" id="machStatHealthy">220</div>
+              <div class="summary-stat-lbl">Healthy</div>
+            </div>
+          </div>
+          <div class="summary-stat-box">
+            <div class="summary-stat-icon yellow">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path></svg>
+            </div>
+            <div>
+              <div class="summary-stat-val" id="machStatWarning">18</div>
+              <div class="summary-stat-lbl">Warning</div>
+            </div>
+          </div>
+          <div class="summary-stat-box">
+            <div class="summary-stat-icon red">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+            </div>
+            <div>
+              <div class="summary-stat-val" id="machStatCritical">10</div>
+              <div class="summary-stat-lbl">Critical</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="filter-left-group">
+            <div class="search-box-wrap" style="width: 260px;">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" class="search-input" id="searchMachinesInput" placeholder="Search machines..." />
+            </div>
+            <select class="filter-select" id="machLocationFilter">
+              <option value="ALL">All Locations</option>
+              <option value="Plant 1">Plant 1</option>
+              <option value="Plant 2">Plant 2</option>
+              <option value="Plant 3">Plant 3</option>
+            </select>
+            <select class="filter-select" id="machStatusFilter">
+              <option value="ALL">All Status</option>
+              <option value="HEALTHY">Healthy</option>
+              <option value="WARNING">Warning</option>
+              <option value="CRITICAL">Critical</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Machines Table (Screen 3) -->
+        <div class="data-table-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Machine ID</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Health Score</th>
+                <th>Last Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="machinesTableBody">
+              <!-- Dynamically populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 4: Machine Details (Screen 4) -->
+      <section class="content-body hidden" id="viewMachineDetails">
+        <div class="breadcrumb-row">
+          <span class="breadcrumb-link" onclick="switchView('machines')">Machines</span>
+          <span>&gt;</span>
+          <span id="machDetailBreadcrumbId">M-001</span>
+        </div>
+
+        <div class="detail-header-row">
+          <div class="detail-title-wrap">
+            <h1 class="detail-title" id="machDetailName">Packaging Line A1</h1>
+            <span class="status-pill healthy" id="machDetailStatusPill">Healthy</span>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-primary-action" id="machActionDiagnoseBtn">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <span>Diagnose</span>
+            </button>
+            <button class="btn-primary-action" style="background-color: var(--sidebar-bg);" id="machActionMaintBtn">
+              <svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+              <span>Maintenance</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sub Tabs -->
+        <div class="tab-nav-bar">
+          <button class="tab-btn active">Overview</button>
+          <button class="tab-btn" onclick="toast('Telemetry stream synced at 100Hz', 'info')">Telemetry</button>
+          <button class="tab-btn" onclick="toast('Maintenance logs loaded', 'info')">Maintenance</button>
+          <button class="tab-btn" onclick="switchView('ai-insights')">AI Insights</button>
+          <button class="tab-btn" onclick="toast('Sensor event logs loaded', 'info')">Logs</button>
+        </div>
+
+        <!-- Machine Content Grid -->
+        <div class="machine-detail-grid">
+          <!-- Left: Image & Info -->
+          <div class="machine-hero-card">
+            <img src="assets/packaging_machine.jpg" alt="Packaging Machine" class="machine-render-img" id="machDetailImg" />
+            <div class="machine-meta-table">
+              <div>
+                <span class="meta-field-label">Machine ID</span>
+                <div class="meta-field-val" id="machDetailMetaId">M-001</div>
+              </div>
+              <div>
+                <span class="meta-field-label">Location</span>
+                <div class="meta-field-val" id="machDetailMetaLocation">Plant 1 - Line A</div>
+              </div>
+              <div>
+                <span class="meta-field-label">Model</span>
+                <div class="meta-field-val" id="machDetailMetaModel">PK-5000</div>
+              </div>
+              <div>
+                <span class="meta-field-label">Installed</span>
+                <div class="meta-field-val" id="machDetailMetaInstalled">Jan 15, 2024</div>
+              </div>
+              <div>
+                <span class="meta-field-label">Last Maintenance</span>
+                <div class="meta-field-val" id="machDetailMetaLastMaint">Feb 1, 2024</div>
+              </div>
+              <div>
+                <span class="meta-field-label">Next Maintenance</span>
+                <div class="meta-field-val" id="machDetailMetaNextMaint">Mar 15, 2024</div>
+              </div>
+              <div>
+                <span class="meta-field-label">Uptime</span>
+                <div class="meta-field-val" style="color:var(--status-healthy);" id="machDetailMetaUptime">99.2%</div>
+              </div>
+              <div>
+                <span class="meta-field-label">Workstation Status</span>
+                <div class="meta-field-val" id="machDetailMetaStatus">AVAILABLE</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Health Score Circular Gauge & Telemetry Stats -->
+          <div class="gauge-panel">
+            <div class="circular-gauge" id="machGaugeContainer">
+              <svg viewBox="0 0 100 100">
+                <circle class="gauge-circle-bg" cx="50" cy="50" r="42" />
+                <circle class="gauge-circle-fill" id="machGaugeFill" cx="50" cy="50" r="42" stroke="var(--status-healthy)" stroke-dasharray="264" stroke-dashoffset="5" />
+              </svg>
+              <div class="gauge-value-text">
+                <span class="gauge-num" id="machGaugeNum">98%</span>
+                <span class="gauge-desc" id="machGaugeDesc">Excellent</span>
+              </div>
+            </div>
+
+            <!-- Telemetry Stat Cards -->
+            <div class="telemetry-grid">
+              <div class="telemetry-stat-card">
+                <div class="telemetry-stat-label">Temperature</div>
+                <div class="telemetry-stat-value" id="machTelTemp">42°C</div>
+              </div>
+              <div class="telemetry-stat-card">
+                <div class="telemetry-stat-label">Vibration</div>
+                <div class="telemetry-stat-value" id="machTelVibration">0.2 mm/s</div>
+              </div>
+              <div class="telemetry-stat-card">
+                <div class="telemetry-stat-label">Power Usage</div>
+                <div class="telemetry-stat-value" id="machTelPower">12.4 kW</div>
+              </div>
+              <div class="telemetry-stat-card">
+                <div class="telemetry-stat-label">Throughput</div>
+                <div class="telemetry-stat-value" id="machTelThroughput">120 units/hr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: Orders Management (Screen 5) -->
+      <section class="content-body hidden" id="viewOrders">
+        <div class="page-title-row">
+          <h1 class="page-title">Orders</h1>
+          <button class="btn-primary-action" id="addOrderBtn">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ New Order</span>
+          </button>
+        </div>
+
+        <!-- 4 Summary Stat Pills -->
+        <div class="stat-pills-row">
+          <div class="summary-stat-box">
+            <div class="summary-stat-icon blue">
+              <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path></svg>
+            </div>
+            <div>
+              <div class="summary-stat-val">1,245</div>
+              <div class="summary-stat-lbl">Total Orders</div>
+            </div>
+          </div>
+          <div class="summary-stat-box">
+            <div class="summary-stat-icon cyan">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            </div>
+            <div>
+              <div class="summary-stat-val">892</div>
+              <div class="summary-stat-lbl">In Transit</div>
+            </div>
+          </div>
+          <div class="summary-stat-box">
+            <div class="summary-stat-icon green">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <div>
+              <div class="summary-stat-val">298</div>
+              <div class="summary-stat-lbl">Delivered</div>
+            </div>
+          </div>
+          <div class="summary-stat-box">
+            <div class="summary-stat-icon red">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            </div>
+            <div>
+              <div class="summary-stat-val">55</div>
+              <div class="summary-stat-lbl">Delayed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div class="filter-left-group">
+            <div class="search-box-wrap" style="width: 240px;">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <input type="text" class="search-input" id="searchOrdersInput" placeholder="Search orders..." />
+            </div>
+            <select class="filter-select" id="orderStatusFilter">
+              <option value="ALL">All Status</option>
+              <option value="IN_TRANSIT">In Transit</option>
+              <option value="DELAYED">Delayed</option>
+              <option value="DELIVERED">Delivered</option>
+            </select>
+            <select class="filter-select" id="orderRegionFilter">
+              <option value="ALL">All Regions</option>
+              <option value="North America">North America</option>
+              <option value="Europe">Europe</option>
+              <option value="Asia Pacific">Asia Pacific</option>
+            </select>
+            <span style="font-size:12.5px; color:var(--text-secondary); margin-left:auto;">Jan 1, 2024 – Jan 31, 2024</span>
+          </div>
+        </div>
+
+        <!-- Orders Table -->
+        <div class="data-table-card">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Destination</th>
+                <th>Status</th>
+                <th>ETA</th>
+                <th>Risk Score</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <!-- Dynamically populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- VIEW 6: Order Details (Screen 6) -->
+      <section class="content-body hidden" id="viewOrderDetails">
+        <div class="breadcrumb-row">
+          <span class="breadcrumb-link" onclick="switchView('orders')">Orders</span>
+          <span>&gt;</span>
+          <span id="orderDetailBreadcrumbId">ORD-00125</span>
+        </div>
+
+        <div class="detail-header-row">
+          <div class="detail-title-wrap">
+            <h1 class="detail-title" id="orderDetailTitle">ORD-00125</h1>
+            <span class="status-pill delayed" id="orderDetailStatusPill">Delayed</span>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-reject" id="orderEditBtn">
+              <svg style="width:14px;height:14px;stroke:currentColor;fill:none;" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+              <span>Edit</span>
+            </button>
+            <button class="btn-primary-action" style="background-color:var(--sidebar-bg);" onclick="toast('Customer representative contacted', 'info')">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+              <span>Contact Customer</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sub Tabs -->
+        <div class="tab-nav-bar">
+          <button class="tab-btn active">Overview</button>
+          <button class="tab-btn" onclick="toast('Delivery timeline loaded', 'info')">Timeline</button>
+          <button class="tab-btn" onclick="toast('Risk factors analyzed', 'info')">Risk Analysis</button>
+          <button class="tab-btn" onclick="switchView('approvals')">AI Recommendations</button>
+          <button class="tab-btn" onclick="toast('Bills of lading loaded', 'info')">Documents</button>
+        </div>
+
+        <!-- Order Detail 3-Column Layout -->
+        <div class="order-detail-3col">
+          <!-- Card 1: Order Information -->
+          <div class="card-panel">
+            <h3 class="panel-title" style="margin-bottom:18px;">Order Information</h3>
+            <div class="order-info-list">
+              <div class="order-info-row">
+                <span class="meta-field-label">Customer</span>
+                <span class="meta-field-val" id="odCustomer">Tech Solutions</span>
+              </div>
+              <div class="order-info-row">
+                <span class="meta-field-label">Destination</span>
+                <span class="meta-field-val" id="odDestination">Chicago, IL</span>
+              </div>
+              <div class="order-info-row">
+                <span class="meta-field-label">Order Date</span>
+                <span class="meta-field-val" id="odOrderDate">Jan 16, 2024</span>
+              </div>
+              <div class="order-info-row">
+                <span class="meta-field-label">Expected Delivery</span>
+                <span class="meta-field-val" id="odExpectedDelivery">Jan 22, 2024</span>
+              </div>
+              <div class="order-info-row">
+                <span class="meta-field-label">Priority</span>
+                <span class="status-pill critical" style="padding:1px 6px; font-size:11px;" id="odPriority">High</span>
+              </div>
+              <div class="order-info-row">
+                <span class="meta-field-label">Items</span>
+                <span class="meta-field-val" id="odItems">12 units</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Risk Analysis -->
+          <div class="card-panel" style="text-align:center;">
+            <h3 class="panel-title" style="margin-bottom:18px; text-align:left;">Risk Analysis</h3>
+            <div class="circular-gauge" style="margin:0 auto 14px;">
+              <svg viewBox="0 0 100 100">
+                <circle class="gauge-circle-bg" cx="50" cy="50" r="42" />
+                <circle class="gauge-circle-fill" id="orderRiskFill" cx="50" cy="50" r="42" stroke="var(--status-critical)" stroke-dasharray="264" stroke-dashoffset="58" />
+              </svg>
+              <div class="gauge-value-text">
+                <span class="gauge-num" style="color:var(--status-critical);" id="orderRiskGaugeNum">78%</span>
+                <span class="gauge-desc" style="color:var(--status-critical); font-weight:700;">High Risk</span>
+              </div>
+            </div>
+            <div class="risk-bullets-list" id="orderRiskFactorsList">
+              <div class="risk-bullet-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg>
+                <span>Machine M-003 at 45% health</span>
+              </div>
+              <div class="risk-bullet-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg>
+                <span>Weather delay predicted</span>
+              </div>
+              <div class="risk-bullet-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line></svg>
+                <span>Alternative route available</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: AI Recommendation -->
+          <div class="card-panel" style="display:flex; flex-direction:column; justify-content:space-between;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:16px;">
+                <div class="brand-icon" style="width:28px;height:28px;background:var(--brand);">
+                  <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"></path></svg>
+                </div>
+                <h3 class="panel-title">AI Recommendation</h3>
+              </div>
+              <div style="background-color:var(--bg-subtle); border-radius:var(--radius-md); padding:16px; margin-bottom:18px;">
+                <h4 style="font-size:15px; font-weight:700; color:var(--text-primary);" id="aiRecTitle">Reroute via Dallas hub</h4>
+                <p style="font-size:13px; color:var(--text-secondary); margin-top:6px;" id="aiRecSubtitle">
+                  Estimated delay reduction: <strong style="color:var(--status-healthy); font-family:var(--font-mono);">36 hours</strong>
+                </p>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <button class="btn-primary-action" style="width:100%; justify-content:center;" id="orderApproveExecuteBtn">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span>Approve & Execute</span>
+              </button>
+              <button class="btn-reject" style="width:100%;" id="orderRescheduleBtn">
+                <span>Reschedule Commitment (SLA)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 7: AI Insights (Screen 7) -->
+      <section class="content-body hidden" id="viewAiInsights">
+        <div class="page-title-row">
+          <div>
+            <h1 class="page-title">AI Insights</h1>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">Powered by Amazon SageMaker & Bedrock Agents</p>
+          </div>
+        </div>
+
+        <!-- Sub Tabs -->
+        <div class="tab-nav-bar">
+          <button class="tab-btn active">Predictions</button>
+          <button class="tab-btn" onclick="toast('Anomalies analyzed across 11 stations', 'info')">Anomalies</button>
+          <button class="tab-btn" onclick="switchView('approvals')">Recommendations</button>
+          <button class="tab-btn" onclick="toast('Natural language pipeline ready', 'info')">Natural Language</button>
+        </div>
+
+        <!-- AI Insights 2-Column Layout -->
+        <div class="ai-insights-grid">
+          <!-- Left: Risk Predictions -->
+          <div class="card-panel">
+            <h3 class="panel-title" style="margin-bottom:18px;">Risk Predictions</h3>
+
+            <div class="prediction-card-row">
+              <div>
+                <div class="pred-title">Order Delay Risk</div>
+                <span style="font-size:11.5px; color:var(--text-muted);">Fleetwide SLA impact</span>
+              </div>
+              <div class="pred-val-group">
+                <span class="pred-number">23%</span>
+                <span class="trend-badge negative">+5%</span>
+              </div>
+            </div>
+
+            <div class="prediction-card-row">
+              <div>
+                <div class="pred-title">Machine Failure Risk</div>
+                <span style="font-size:11.5px; color:var(--text-muted);">Bearing thermal drift</span>
+              </div>
+              <div class="pred-val-group">
+                <span class="pred-number">12%</span>
+                <span class="trend-badge negative">+2%</span>
+              </div>
+            </div>
+
+            <div class="prediction-card-row">
+              <div>
+                <div class="pred-title">Maintenance Need</div>
+                <span style="font-size:11.5px; color:var(--text-muted);">Preventive window active</span>
+              </div>
+              <div class="pred-val-group">
+                <span class="pred-number">6%</span>
+                <span class="trend-badge positive">-2%</span>
+              </div>
+            </div>
+
+            <div class="prediction-card-row">
+              <div>
+                <div class="pred-title">Supply Chain Risk</div>
+                <span style="font-size:11.5px; color:var(--text-muted);">Inbound customs clearance</span>
+              </div>
+              <div class="pred-val-group">
+                <span class="pred-number">18%</span>
+                <span class="trend-badge negative">+7%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: AI Assistant -->
+          <div class="card-panel ai-chat-panel">
+            <div class="panel-header" style="margin-bottom:8px;">
+              <h3 class="panel-title">AI Assistant</h3>
+              <span style="font-size:11.5px; color:var(--text-muted);">Bedrock Nova-Lite Grounded</span>
+            </div>
+
+            <!-- Quick Prompt Chips -->
+            <div class="quick-prompt-chips">
+              <button class="prompt-chip-btn" data-chip="Which machines are likely to fail this week?">Which machines are likely to fail this week?</button>
+              <button class="prompt-chip-btn" data-chip="Show me high-risk orders">Show me high-risk orders</button>
+              <button class="prompt-chip-btn" data-chip="What maintenance should I schedule?">What maintenance should I schedule?</button>
+              <button class="prompt-chip-btn" data-chip="Analyze production efficiency">Analyze production efficiency</button>
+            </div>
+
+            <!-- Chat History -->
+            <div class="chat-history" id="aiChatHistory">
+              <div class="chat-bubble ai">Hello Alex! I am your Operations Copilot grounded in plant telemetry and capacity models. How can I assist your operations today?</div>
+            </div>
+
+            <!-- Chat Input -->
+            <form id="aiChatForm" class="chat-input-bar">
+              <input type="text" class="chat-input" id="aiChatInput" placeholder="Ask anything about your operations..." />
+              <button type="submit" class="chat-send-btn">
+                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 8: Approvals (Screen 8) -->
+      <section class="content-body hidden" id="viewApprovals">
+        <div class="page-title-row">
+          <h1 class="page-title">Pending Approvals</h1>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="tab-nav-bar">
+          <button class="tab-btn active" data-appr-tab="ALL">All (4)</button>
+          <button class="tab-btn" data-appr-tab="REROUTING">Rerouting (1)</button>
+          <button class="tab-btn" data-appr-tab="MAINTENANCE">Maintenance (1)</button>
+          <button class="tab-btn" data-appr-tab="EXCEPTION">Exception (2)</button>
+        </div>
+
+        <!-- Approvals List -->
+        <div class="approval-cards-list" id="approvalsListContainer">
+          <!-- Filled dynamically by app.js -->
+        </div>
+      </section>
+
+      <!-- VIEW 9: Reports & Analytics (Screen 9) -->
+      <section class="content-body hidden" id="viewReports">
+        <div class="page-title-row">
+          <h1 class="page-title">Reports & Analytics</h1>
+          <div style="display:flex; gap:12px; align-items:center;">
+            <span style="font-size:13px; color:var(--text-secondary);">Jan 1, 2024 – Jan 31, 2024</span>
+            <button class="btn-primary-action" style="background-color:var(--sidebar-bg);" onclick="toast('Analytics export generated: opsrelay_report.csv', 'success')">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              <span>Export</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Sub Tabs -->
+        <div class="tab-nav-bar">
+          <button class="tab-btn active">Operational</button>
+          <button class="tab-btn" onclick="toast('Financial SLA analytics loaded', 'info')">Financial</button>
+          <button class="tab-btn" onclick="toast('Predictive models loaded', 'info')">Predictive</button>
+          <button class="tab-btn" onclick="toast('Custom report builder loaded', 'info')">Custom</button>
+        </div>
+
+        <!-- Reports Grid: Bar Chart & Donut Chart -->
+        <div class="reports-grid-2">
+          <!-- On-Time Delivery Rate Bar Chart -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <div>
+                <h3 class="panel-title">On-Time Delivery Rate</h3>
+                <div style="display:flex; align-items:baseline; gap:8px; margin-top:4px;">
+                  <span style="font-size:28px; font-weight:800; color:var(--text-primary);">96.8%</span>
+                  <span class="trend-badge positive">+1.2%</span>
+                </div>
+              </div>
+            </div>
+            <div class="chart-container" id="deliveryBarChartContainer">
+              <!-- Rendered via SVG -->
+            </div>
+          </div>
+
+          <!-- Delay Causes Donut Chart -->
+          <div class="card-panel">
+            <div class="panel-header">
+              <h3 class="panel-title">Delay Causes</h3>
+            </div>
+            <div style="display:flex; align-items:center; gap:24px; height:240px;" id="donutChartWrap">
+              <div style="width:160px; height:160px; flex-shrink:0;">
+                <svg viewBox="0 0 42 42" style="width:100%;height:100%;transform:rotate(-90deg);">
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#2563eb" stroke-width="6" stroke-dasharray="42 58" stroke-dashoffset="0"></circle>
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f97316" stroke-width="6" stroke-dasharray="28 72" stroke-dashoffset="-42"></circle>
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#10b981" stroke-width="6" stroke-dasharray="18 82" stroke-dashoffset="-70"></circle>
+                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#94a3b8" stroke-width="6" stroke-dasharray="12 88" stroke-dashoffset="-88"></circle>
+                </svg>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px; font-size:13px; color:var(--text-secondary);">
+                <div style="display:flex; align-items:center; gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#2563eb;"></span><span>Machine Issues <strong>42%</strong></span></div>
+                <div style="display:flex; align-items:center; gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#f97316;"></span><span>Weather <strong>28%</strong></span></div>
+                <div style="display:flex; align-items:center; gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#10b981;"></span><span>Supply Chain <strong>18%</strong></span></div>
+                <div style="display:flex; align-items:center; gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#94a3b8;"></span><span>Other <strong>12%</strong></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 10: Settings (Screen 10) -->
+      <section class="content-body hidden" id="viewSettings">
+        <div class="page-title-row">
+          <h1 class="page-title">Settings</h1>
+        </div>
+
+        <!-- Sub Tabs -->
+        <div class="tab-nav-bar">
+          <button class="tab-btn active">Profile</button>
+          <button class="tab-btn" onclick="toast('Notification rules loaded', 'info')">Notifications</button>
+          <button class="tab-btn" onclick="toast('AWS IoT & SAP connectors active', 'info')">Integrations</button>
+          <button class="tab-btn" onclick="toast('IAM & Cognito role policies verified', 'info')">Security</button>
+          <button class="tab-btn" onclick="toast('Preferences synced', 'info')">Preferences</button>
+        </div>
+
+        <div class="settings-container">
+          <!-- Profile Card -->
+          <div class="settings-profile-card">
+            <div class="settings-avatar-row">
+              <div class="avatar-large">AC</div>
+              <div>
+                <h3 style="font-size:18px; font-weight:700; color:var(--text-primary);">Alex Chen</h3>
+                <p style="font-size:13px; color:var(--text-secondary);">Operations Manager · alex@company.com</p>
+              </div>
+            </div>
+
+            <form class="settings-form-grid" onsubmit="event.preventDefault(); toast('Profile settings saved successfully', 'success');">
+              <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" class="search-input" value="Alex Chen" style="border-radius:var(--radius-md);" />
+              </div>
+              <div class="input-group">
+                <label>Email</label>
+                <input type="email" class="search-input" value="alex@company.com" style="border-radius:var(--radius-md);" />
+              </div>
+              <div class="input-group">
+                <label>Role</label>
+                <input type="text" class="search-input" value="Operations Manager" style="border-radius:var(--radius-md);" />
+              </div>
+              <div class="input-group">
+                <label>Department</label>
+                <input type="text" class="search-input" value="Operations" style="border-radius:var(--radius-md);" />
+              </div>
+              <div style="grid-column: 1 / -1; margin-top: 10px;">
+                <button type="submit" class="btn-primary-action">Save Changes</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Theme Customizer Section (Screens 13-20) -->
+          <div class="card-panel">
+            <h3 class="panel-title">Appearance & Themes (Screens 13–20)</h3>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">Select an enterprise visual theme palette:</p>
+
+            <div class="themes-grid" id="themesGrid">
+              <!-- Rendered dynamically by app.js -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: Alerts (Dedicated List) -->
+      <section class="content-body hidden" id="viewAlerts">
+        <div class="page-title-row">
+          <h1 class="page-title">Active Factory Alerts</h1>
+        </div>
+        <div class="card-panel">
+          <div class="alerts-list" id="allAlertsList"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Screen 11: Notifications Slide-over Drawer -->
+  <aside class="notifications-drawer" id="notificationsDrawer">
+    <div class="drawer-header">
+      <h3 style="font-size:16px; font-weight:700; color:var(--text-primary);">Notifications</h3>
+      <button class="drawer-close-btn" id="closeDrawerBtn">&times;</button>
+    </div>
+    <div class="tab-nav-bar" style="padding:0 16px; margin-bottom:0;">
+      <button class="tab-btn active" data-notif-tab="ALL">All</button>
+      <button class="tab-btn" data-notif-tab="ALERTS">Alerts</button>
+      <button class="tab-btn" data-notif-tab="APPROVALS">Approvals</button>
+      <button class="tab-btn" data-notif-tab="SYSTEM">System</button>
+    </div>
+    <div class="drawer-body" id="notificationsDrawerBody">
+      <!-- Populated dynamically by app.js -->
+    </div>
+  </aside>
+
+  <!-- Reschedule Commitment SLA Modal (Diagram 03) -->
+  <div class="modal-backdrop hidden" id="rescheduleModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Reschedule Production Commitment</h3>
+        <button class="drawer-close-btn" data-close-modal="rescheduleModal">&times;</button>
+      </div>
+      <form id="rescheduleForm" class="modal-body">
+        <input type="hidden" id="rescheduleOrderId" />
+        <div class="input-group" style="margin-bottom:16px;">
+          <label style="font-size:12.5px; font-weight:600;">Target Work Order</label>
+          <input type="text" id="rescheduleOrderDisplay" class="search-input" disabled style="border-radius:var(--radius-md); opacity:0.8; margin-top:4px;" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+          <div class="input-group">
+            <label style="font-size:12.5px; font-weight:600;">Current Due Date</label>
+            <input type="text" id="rescheduleCurrentDue" class="search-input" disabled style="border-radius:var(--radius-md); opacity:0.7; margin-top:4px;" />
+          </div>
+          <div class="input-group">
+            <label style="font-size:12.5px; font-weight:600;">New Extended SLA Due Date *</label>
+            <input type="datetime-local" id="rescheduleNewDueDate" class="search-input" required style="border-radius:var(--radius-md); margin-top:4px;" />
+          </div>
+        </div>
+        <div class="input-group" style="margin-bottom:20px;">
+          <label style="font-size:12.5px; font-weight:600;">Batch Quantity</label>
+          <input type="number" id="rescheduleQuantity" class="search-input" min="1" style="border-radius:var(--radius-md); margin-top:4px;" />
+        </div>
+        <div class="modal-footer" style="margin:-24px; margin-top:16px;">
+          <button type="button" class="btn-reject" data-close-modal="rescheduleModal">Cancel</button>
+          <button type="submit" class="btn-primary-action">Confirm SLA Adjustment</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Machine Modal -->
+  <div class="modal-backdrop hidden" id="addMachineModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Register New Factory Machine</h3>
+        <button class="drawer-close-btn" data-close-modal="addMachineModal">&times;</button>
+      </div>
+      <form id="addMachineForm" class="modal-body">
+        <div class="input-group" style="margin-bottom:14px;">
+          <label style="font-size:12.5px; font-weight:600;">Machine ID</label>
+          <input type="text" id="newMachineId" class="search-input" placeholder="M-008" required style="border-radius:var(--radius-md); margin-top:4px;" />
+        </div>
+        <div class="input-group" style="margin-bottom:14px;">
+          <label style="font-size:12.5px; font-weight:600;">Name / Line</label>
+          <input type="text" id="newMachineName" class="search-input" placeholder="Packaging Line A2" required style="border-radius:var(--radius-md); margin-top:4px;" />
+        </div>
+        <div class="input-group" style="margin-bottom:14px;">
+          <label style="font-size:12.5px; font-weight:600;">Location</label>
+          <input type="text" id="newMachineLocation" class="search-input" placeholder="Plant 1 - Line B" required style="border-radius:var(--radius-md); margin-top:4px;" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+          <div class="input-group">
+            <label style="font-size:12.5px; font-weight:600;">Capacity (units/hr)</label>
+            <input type="number" id="newMachineCapacity" class="search-input" value="120" style="border-radius:var(--radius-md); margin-top:4px;" />
+          </div>
+          <div class="input-group">
+            <label style="font-size:12.5px; font-weight:600;">Status</label>
+            <select id="newMachineStatus" class="filter-select" style="width:100%; margin-top:4px;">
+              <option value="AVAILABLE">AVAILABLE / HEALTHY</option>
+              <option value="DEGRADED">DEGRADED / WARNING</option>
+              <option value="STOPPED">STOPPED / CRITICAL</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer" style="margin:-24px; margin-top:16px;">
+          <button type="button" class="btn-reject" data-close-modal="addMachineModal">Cancel</button>
+          <button type="submit" class="btn-primary-action">Register Machine</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Order Modal -->
+  <div class="modal-backdrop hidden" id="addOrderModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Commission New Production Order</h3>
+        <button class="drawer-close-btn" data-close-modal="addOrderModal">&times;</button>
+      </div>
+      <form id="addOrderForm" class="modal-body">
+        <div class="input-group" style="margin-bottom:14px;">
+          <label style="font-size:12.5px; font-weight:600;">Order ID</label>
+          <input type="text" id="newOrderId" class="search-input" placeholder="ORD-00128" required style="border-radius:var(--radius-md); margin-top:4px;" />
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+          <div class="input-group">
+            <label style="font-size:12.5px; font-weight:600;">Customer</label>
+            <input type="text" id="newOrderCustomer" class="search-input" placeholder="AeroDynamics Corp" required style="border-radius:var(--radius-md); margin-top:4px;" />
+          </div>
+          <div class="input-group">
+            <label style="font-size:12.5px; font-weight:600;">Destination</label>
+            <input type="text" id="newOrderDestination" class="search-input" placeholder="Seattle, WA" required style="border-radius:var(--radius-md); margin-top:4px;" />
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+          <div class="input-group">
+            <label style="font-size:12.5px; font-weight:600;">Quantity</label>
+            <input type="number" id="newOrderQuantity" class="search-input" value="500" style="border-radius:var(--radius-md); margin-top:4px;" />
+          </div>
+          <div class="input-group">
+            <label style="font-size:12.5px; font-weight:600;">Assigned Machine</label>
+            <select id="newOrderMachine" class="filter-select" style="width:100%; margin-top:4px;"></select>
+          </div>
+        </div>
+        <div class="modal-footer" style="margin:-24px; margin-top:16px;">
+          <button type="button" class="btn-reject" data-close-modal="addOrderModal">Cancel</button>
+          <button type="submit" class="btn-primary-action">Commission Order</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast-box hidden"></div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
