@@ -837,10 +837,16 @@ document.addEventListener("DOMContentLoaded", () => {
         await cognitoLogin($("loginEmail").value.trim(), $("loginPassword").value);
       } catch (err) {
         toast(err.message, "error");
+        setTimeout(() => {
+          const fallback = confirm(`Cognito authentication message:\n"${err.message}"\n\nWould you like to enter directly with Instant Judge Demo Access instead?`);
+          if (fallback) {
+            demoLogin("supervisor");
+          }
+        }, 300);
       } finally {
         if (submit) {
           submit.disabled = false;
-          submit.textContent = "Sign In";
+          submit.textContent = "Sign In with Cognito";
         }
       }
     });
@@ -885,6 +891,8 @@ document.addEventListener("DOMContentLoaded", () => {
       toast(err.message, "error");
     }
   });
+  if ($("judgeDemoBtn")) $("judgeDemoBtn").addEventListener("click", () => demoLogin("supervisor"));
+  if ($("landingNavJudgeBtn")) $("landingNavJudgeBtn").addEventListener("click", () => demoLogin("supervisor"));
   if ($("judgeSupervisorBtn")) $("judgeSupervisorBtn").addEventListener("click", () => demoLogin("supervisor"));
   if ($("judgeManagerBtn")) $("judgeManagerBtn").addEventListener("click", () => demoLogin("manager"));
   if ($("judgeAnalystBtn")) $("judgeAnalystBtn").addEventListener("click", () => demoLogin("analyst"));

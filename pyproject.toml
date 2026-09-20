@@ -1,6 +1,7 @@
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+pythonpath = ["api", "."]
+testpaths = ["api/tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --tb=short --cov=deploy/lambda --cov-report=term-missing"
+addopts = "-v --tb=short"
