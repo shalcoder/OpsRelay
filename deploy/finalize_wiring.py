@@ -104,7 +104,7 @@ api_env = {
         "SAGEMAKER_ENABLED": "true",
         "SAGEMAKER_ENDPOINT_NAME": "opsrelay-predictor",
         "STRANDS_ENABLED": "true",
-        "BEDROCK_MODEL_ID": "amazon.nova-lite-v1:0"
+        "BEDROCK_MODEL_ID": "apac.amazon.nova-lite-v1:0"
     }
 }
 

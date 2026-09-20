@@ -49,7 +49,7 @@ sam deploy --stack-name "$STACK_NAME" --region "$AWS_REGION" --capabilities CAPA
   SageMakerEnabled=true \
   SageMakerEndpointName=opsrelay-predictor \
   StrandsEnabled=true \
-  BedrockModelId=amazon.nova-lite-v1:0
+  BedrockModelId=apac.amazon.nova-lite-v1:0
 ```
 
 Strands runs inside the Lambda process; the default model provider is Amazon Bedrock. The API Lambda needs permission to use the selected model. Add the least-privilege Bedrock invoke policy for the model you choose before enabling `StrandsEnabled`.

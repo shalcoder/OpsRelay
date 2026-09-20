@@ -288,7 +288,7 @@ Write-Host "  Deploying opsrelay-api..." -ForegroundColor Yellow
     --handler "lambda_api.handler" `
     --timeout 30 `
     --memory-size 512 `
-    --environment "Variables={OPSRELAY_MODE=cloud,OPSRELAY_TABLE_NAME=$MAIN_TABLE,OPSRELAY_RAW_BUCKET=$DATA_BUCKET,OPSRELAY_EVENT_BUS=default,SAGEMAKER_ENABLED=true,SAGEMAKER_ENDPOINT_NAME=opsrelay-predictor,STRANDS_ENABLED=true,BEDROCK_MODEL_ID=amazon.nova-lite-v1:0}" `
+    --environment "Variables={OPSRELAY_MODE=cloud,OPSRELAY_TABLE_NAME=$MAIN_TABLE,OPSRELAY_RAW_BUCKET=$DATA_BUCKET,OPSRELAY_EVENT_BUS=default,SAGEMAKER_ENABLED=true,SAGEMAKER_ENDPOINT_NAME=opsrelay-predictor,STRANDS_ENABLED=true,BEDROCK_MODEL_ID=apac.amazon.nova-lite-v1:0}" `
     --region $REGION | Out-Null
 Write-Host "  opsrelay-api updated with full Signal-to-Action engine." -ForegroundColor Green
 

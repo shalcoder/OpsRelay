@@ -37,7 +37,7 @@ Parameters:
     Default: 'false'
   BedrockModelId:
     Type: String
-    Default: 'amazon.nova-lite-v1:0'
+    Default: 'apac.amazon.nova-lite-v1:0'
 
 Resources:
   OpsRelayUserPool:

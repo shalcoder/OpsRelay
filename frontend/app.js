@@ -586,6 +586,10 @@ async function askAi(customQuestion = null) {
       method: "POST",
       body: JSON.stringify({ question: q, orderId: state.selectedOrder })
     });
+    const isLiveModel = res.mode === "strands" || res.mode?.startsWith("bedrock-");
+    if ($("aiProviderStatus")) {
+      $("aiProviderStatus").textContent = isLiveModel ? "Bedrock Nova Lite · live" : "Deterministic fallback · model access pending";
+    }
     appendChat(res.answer || "Analysis complete.", "ai");
   } catch (err) {
     appendChat(`Operations AI: ${err.message}`, "ai");

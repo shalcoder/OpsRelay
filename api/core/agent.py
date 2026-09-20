@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 from datetime import datetime, timezone
 from typing import Any, Callable
@@ -22,6 +23,8 @@ Answer in compact operational language: situation, evidence, recommendation, own
 
 
 import uuid
+
+logger = logging.getLogger(__name__)
 
 
 class PolicyGuard:
@@ -58,7 +61,7 @@ class OpsRelayAgent:
         self.service = service
         self.policy_guard = PolicyGuard(service)
         self.region = os.getenv("AWS_REGION", "ap-south-1")
-        self.model_id = os.getenv("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0")
+        self.model_id = os.getenv("BEDROCK_MODEL_ID", "apac.amazon.nova-lite-v1:0")
         self.bedrock_client = boto3.client("bedrock-runtime", region_name=self.region) if boto3 else None
         self.enabled = os.getenv("STRANDS_ENABLED", "false").lower() == "true" and Agent is not None
         self._agent = None
@@ -110,14 +113,15 @@ class OpsRelayAgent:
     def ask(self, question: str, order_id: str | None = None) -> dict[str, Any]:
         context = self.service.build_context(order_id) if order_id else self.service.build_dashboard_context()
         answer = None
-        mode = "evidence-synthesis"
+        mode = "deterministic-fallback"
         if self._agent:
             try:
                 prompt = f"Question: {question}\nOrder focus: {order_id or 'none'}\nInitial context:\n{json.dumps(context, default=str)}"
                 result = self._agent(prompt)
                 answer = str(result)
                 mode = "strands"
-            except Exception:
+            except Exception as exc:
+                logger.exception("Strands agent failed: %s", type(exc).__name__)
                 answer = None
 
         if not answer and self.bedrock_client:
@@ -130,12 +134,13 @@ class OpsRelayAgent:
                 )
                 answer = response["output"]["message"]["content"][0]["text"]
                 mode = f"bedrock-{self.model_id.split(':')[0].split('.')[-1]}"
-            except Exception:
+            except Exception as exc:
+                logger.exception("Bedrock Converse failed: %s", type(exc).__name__)
                 answer = None
 
         if not answer:
             answer = self._fallback(question, context)
-            mode = "evidence-synthesis"
+            mode = "deterministic-fallback"
 
         # Diagram 14: Persist AGENT_SESSION interaction record
         session_id = f"SES-{uuid.uuid4().hex[:8].upper()}"
