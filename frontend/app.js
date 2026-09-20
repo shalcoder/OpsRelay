@@ -140,10 +140,10 @@ function openJudgeSignIn() {
   toggleLoginScreen(true);
   showAuthForm("loginForm");
   if ($("loginEmail")) {
-    $("loginEmail").value = "judge@opsrelay.com";
+    $("loginEmail").value = "demo@opsrelay.com";
     $("loginPassword")?.focus();
   }
-  toast("Judge account selected. Enter the evaluator password to continue.", "info");
+  toast("Demo credentials loaded. Ready to sign in.", "info");
 }
 
 function toast(msg, type = "info") {
@@ -844,7 +844,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         toast(err.message, "error");
         setTimeout(() => {
-          const fallback = confirm(`Cognito authentication message:\n"${err.message}"\n\nWould you like to enter directly with Instant Judge Demo Access instead?`);
+          const fallback = confirm(`Authentication message:\n"${err.message}"\n\nWould you like to enter the live demo environment instead?`);
           if (fallback) {
             demoLogin("supervisor");
           }
