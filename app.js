@@ -95,6 +95,57 @@ async function cognitoLogin(username, password) {
   toggleLoginScreen(false, `Signed in as ${username}`);
 }
 
+async function cognitoRegister(username, password) {
+  const cognito = cfg.cognito || {};
+  const response = await fetch(cognito.endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-amz-json-1.1",
+      "X-Amz-Target": "AWSCognitoIdentityProviderService.SignUp"
+    },
+    body: JSON.stringify({
+      ClientId: cognito.clientId,
+      Username: username,
+      Password: password,
+      UserAttributes: [{ Name: "email", Value: username }]
+    })
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.message || "Account registration failed");
+  return body.UserConfirmed === true;
+}
+
+async function confirmCognitoUser(username, code) {
+  const cognito = cfg.cognito || {};
+  const response = await fetch(cognito.endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-amz-json-1.1",
+      "X-Amz-Target": "AWSCognitoIdentityProviderService.ConfirmSignUp"
+    },
+    body: JSON.stringify({ ClientId: cognito.clientId, Username: username, ConfirmationCode: code })
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body.message || "Email verification failed");
+}
+
+function showAuthForm(formName) {
+  ["loginForm", "registerForm", "confirmForm"].forEach(name => {
+    if ($(name)) $(name).classList.toggle("hidden", name !== formName);
+  });
+  if ($("createAccountPrompt")) $("createAccountPrompt").classList.toggle("hidden", formName !== "loginForm");
+}
+
+function openJudgeSignIn() {
+  toggleLoginScreen(true);
+  showAuthForm("loginForm");
+  if ($("loginEmail")) {
+    $("loginEmail").value = "judge@opsrelay.com";
+    $("loginPassword")?.focus();
+  }
+  toast("Judge account selected. Enter the evaluator password to continue.", "info");
+}
+
 function toast(msg, type = "info") {
   const t = $("toast");
   if (!t) return;
@@ -790,6 +841,46 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+  if ($("createAccountLink")) $("createAccountLink").addEventListener("click", e => {
+    e.preventDefault();
+    showAuthForm("registerForm");
+  });
+  if ($("backToLoginBtn")) $("backToLoginBtn").addEventListener("click", () => showAuthForm("loginForm"));
+  if ($("backToLoginFromConfirmBtn")) $("backToLoginFromConfirmBtn").addEventListener("click", () => showAuthForm("loginForm"));
+  if ($("registerForm")) $("registerForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const email = $("registerEmail").value.trim();
+    const password = $("registerPassword").value;
+    if (password !== $("registerPasswordConfirm").value) {
+      toast("Passwords do not match", "error");
+      return;
+    }
+    try {
+      const confirmed = await cognitoRegister(email, password);
+      if (confirmed) {
+        $("loginEmail").value = email;
+        showAuthForm("loginForm");
+        toast("Account created. You can sign in now.", "success");
+      } else {
+        state.pendingRegistrationEmail = email;
+        showAuthForm("confirmForm");
+        toast("Check your email for the verification code.", "info");
+      }
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  });
+  if ($("confirmForm")) $("confirmForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    try {
+      await confirmCognitoUser(state.pendingRegistrationEmail, $("confirmCode").value.trim());
+      $("loginEmail").value = state.pendingRegistrationEmail;
+      showAuthForm("loginForm");
+      toast("Email verified. Sign in to continue.", "success");
+    } catch (err) {
+      toast(err.message, "error");
+    }
+  });
   if ($("judgeSupervisorBtn")) $("judgeSupervisorBtn").addEventListener("click", () => demoLogin("supervisor"));
   if ($("judgeManagerBtn")) $("judgeManagerBtn").addEventListener("click", () => demoLogin("manager"));
   if ($("judgeAnalystBtn")) $("judgeAnalystBtn").addEventListener("click", () => demoLogin("analyst"));
@@ -946,7 +1037,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Landing Page & Demo Modal bindings
   if ($("landingBrandLogoLink")) $("landingBrandLogoLink").addEventListener("click", e => { e.preventDefault(); showLandingPage(true); });
-  if ($("landingNavSignInBtn")) $("landingNavSignInBtn").addEventListener("click", () => toggleLoginScreen(true));
+  if ($("landingNavSignInBtn")) $("landingNavSignInBtn").addEventListener("click", () => {
+    toggleLoginScreen(true);
+    showAuthForm("loginForm");
+  });
+  if ($("landingNavJudgeBtn")) $("landingNavJudgeBtn").addEventListener("click", openJudgeSignIn);
   if ($("landingNavGetStartedBtn")) $("landingNavGetStartedBtn").addEventListener("click", () => showLandingPage(false));
   if ($("heroGetStartedBtn")) $("heroGetStartedBtn").addEventListener("click", () => showLandingPage(false));
   if ($("heroWatchDemoBtn")) $("heroWatchDemoBtn").addEventListener("click", () => {

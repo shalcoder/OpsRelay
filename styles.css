@@ -514,6 +514,19 @@ body {
   font-weight: 600;
 }
 
+.login-text-btn {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--brand);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
 /* App Shell */
 .app-shell {
   display: flex;
