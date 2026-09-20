@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="relayGradPrimary" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="relayGradCyan" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <filter id="relayGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#2563eb" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Outer Hexagonal Frame -->
+  <polygon points="50,6 88,28 88,72 50,94 12,72 12,28" 
+           stroke="url(#relayGradPrimary)" stroke-width="7" stroke-linejoin="round" filter="url(#relayGlow)" />
+
+  <!-- Internal Interconnected Relay Nodes -->
+  <!-- Top Node -->
+  <polygon points="50,20 66,29 66,47 50,56 34,47 34,29" 
+           stroke="url(#relayGradCyan)" stroke-width="4.5" stroke-linejoin="round" fill="rgba(6, 182, 212, 0.12)" />
+
+  <!-- Bottom Left Node -->
+  <polygon points="30,52 46,61 46,79 30,88 14,79 14,61" 
+           stroke="url(#relayGradPrimary)" stroke-width="4.5" stroke-linejoin="round" fill="rgba(37, 99, 235, 0.12)" />
+
+  <!-- Bottom Right Node -->
+  <polygon points="70,52 86,61 86,79 70,88 54,79 54,61" 
+           stroke="url(#relayGradPrimary)" stroke-width="4.5" stroke-linejoin="round" fill="rgba(37, 99, 235, 0.12)" />
+
+  <!-- Relay Data Link Lines -->
+  <path d="M50,47 L50,65 M38,40 L26,58 M62,40 L74,58 M40,70 L60,70" 
+        stroke="url(#relayGradCyan)" stroke-width="4.5" stroke-linecap="round" />
+
+  <!-- Core Pulse Beacon Center -->
+  <circle cx="50" cy="56" r="4.5" fill="#38bdf8" />
+  <circle cx="50" cy="56" r="2" fill="#ffffff" />
+</svg>
