@@ -912,68 +912,24 @@
         </div>
 
         <!-- Sub Tabs -->
-        <div class="tab-nav-bar">
-          <button class="tab-btn active">Predictions</button>
-          <button class="tab-btn" onclick="toast('Anomalies analyzed across 11 stations', 'info')">Anomalies</button>
-          <button class="tab-btn" onclick="switchView('approvals')">Recommendations</button>
-          <button class="tab-btn" onclick="toast('Natural language pipeline ready', 'info')">Natural Language</button>
+        <div class="tab-nav-bar" id="aiInsightsTabs">
+          <button class="tab-btn active" data-ai-subtab="predictions">Predictions</button>
+          <button class="tab-btn" data-ai-subtab="anomalies">Anomalies</button>
+          <button class="tab-btn" data-ai-subtab="recommendations">Recommendations</button>
+          <button class="tab-btn" data-ai-subtab="chat">Natural Language</button>
         </div>
 
         <!-- AI Insights 2-Column Layout -->
         <div class="ai-insights-grid">
-          <!-- Left: Risk Predictions -->
-          <div class="card-panel">
-            <h3 class="panel-title" style="margin-bottom:18px;">Risk Predictions</h3>
-
-            <div class="prediction-card-row">
-              <div>
-                <div class="pred-title">Order Delay Risk</div>
-                <span style="font-size:11.5px; color:var(--text-muted);">Fleetwide SLA impact</span>
-              </div>
-              <div class="pred-val-group">
-                <span class="pred-number">23%</span>
-                <span class="trend-badge negative">+5%</span>
-              </div>
-            </div>
-
-            <div class="prediction-card-row">
-              <div>
-                <div class="pred-title">Machine Failure Risk</div>
-                <span style="font-size:11.5px; color:var(--text-muted);">Bearing thermal drift</span>
-              </div>
-              <div class="pred-val-group">
-                <span class="pred-number">12%</span>
-                <span class="trend-badge negative">+2%</span>
-              </div>
-            </div>
-
-            <div class="prediction-card-row">
-              <div>
-                <div class="pred-title">Maintenance Need</div>
-                <span style="font-size:11.5px; color:var(--text-muted);">Preventive window active</span>
-              </div>
-              <div class="pred-val-group">
-                <span class="pred-number">6%</span>
-                <span class="trend-badge positive">-2%</span>
-              </div>
-            </div>
-
-            <div class="prediction-card-row">
-              <div>
-                <div class="pred-title">Supply Chain Risk</div>
-                <span style="font-size:11.5px; color:var(--text-muted);">Inbound customs clearance</span>
-              </div>
-              <div class="pred-val-group">
-                <span class="pred-number">18%</span>
-                <span class="trend-badge negative">+7%</span>
-              </div>
-            </div>
+          <!-- Left: Dynamic Sub-tab Panel -->
+          <div class="card-panel" id="aiInsightsLeftPanel">
+            <!-- Rendered dynamically by renderAiInsights() -->
           </div>
 
           <!-- Right: AI Assistant -->
           <div class="card-panel ai-chat-panel">
             <div class="panel-header" style="margin-bottom:8px;">
-              <h3 class="panel-title">AI Assistant</h3>
+              <h3 class="panel-title">Operations AI Copilot</h3>
               <span id="aiProviderStatus" style="font-size:11.5px; color:var(--text-muted);">Grounded operations analysis</span>
             </div>
 
@@ -1009,14 +965,14 @@
 
         <!-- Filter Tabs -->
         <div class="tab-nav-bar">
-          <button class="tab-btn active" data-appr-tab="ALL">All (4)</button>
-          <button class="tab-btn" data-appr-tab="REROUTING">Rerouting (1)</button>
-          <button class="tab-btn" data-appr-tab="MAINTENANCE">Maintenance (1)</button>
-          <button class="tab-btn" data-appr-tab="EXCEPTION">Exception (2)</button>
+          <button class="tab-btn active" data-appr-tab="ALL">All</button>
+          <button class="tab-btn" data-appr-tab="REROUTING">Rerouting</button>
+          <button class="tab-btn" data-appr-tab="MAINTENANCE">Maintenance</button>
+          <button class="tab-btn" data-appr-tab="EXCEPTION">Exception</button>
         </div>
 
         <!-- Approvals List -->
-        <div class="approval-cards-list" id="approvalsListContainer">
+        <div class="approvals-list-wrap" id="approvalsListContainer">
           <!-- Filled dynamically by app.js -->
         </div>
       </section>
@@ -1026,62 +982,25 @@
         <div class="page-title-row">
           <h1 class="page-title">Reports & Analytics</h1>
           <div style="display:flex; gap:12px; align-items:center;">
-            <span style="font-size:13px; color:var(--text-secondary);">Jan 1, 2024 – Jan 31, 2024</span>
-            <button class="btn-primary-action" style="background-color:var(--sidebar-bg);" onclick="toast('Analytics export generated: opsrelay_report.csv', 'success')">
+            <span id="reportsDateRange" style="font-size:13px; color:var(--text-secondary);">September 2026 · Shift Active</span>
+            <button class="btn-primary-action" style="background-color:var(--sidebar-bg);" id="reportsExportBtn">
               <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              <span>Export</span>
+              <span>Export CSV</span>
             </button>
           </div>
         </div>
 
         <!-- Sub Tabs -->
-        <div class="tab-nav-bar">
-          <button class="tab-btn active">Operational</button>
-          <button class="tab-btn" onclick="toast('Financial SLA analytics loaded', 'info')">Financial</button>
-          <button class="tab-btn" onclick="toast('Predictive models loaded', 'info')">Predictive</button>
-          <button class="tab-btn" onclick="toast('Custom report builder loaded', 'info')">Custom</button>
+        <div class="tab-nav-bar" id="reportsTabs">
+          <button class="tab-btn active" data-rep-tab="operational">Operational</button>
+          <button class="tab-btn" data-rep-tab="financial">Financial</button>
+          <button class="tab-btn" data-rep-tab="predictive">Predictive</button>
+          <button class="tab-btn" data-rep-tab="custom">Custom</button>
         </div>
 
-        <!-- Reports Grid: Bar Chart & Donut Chart -->
-        <div class="reports-grid-2">
-          <!-- On-Time Delivery Rate Bar Chart -->
-          <div class="card-panel">
-            <div class="panel-header">
-              <div>
-                <h3 class="panel-title">On-Time Delivery Rate</h3>
-                <div style="display:flex; align-items:baseline; gap:8px; margin-top:4px;">
-                  <span style="font-size:28px; font-weight:800; color:var(--text-primary);">96.8%</span>
-                  <span class="trend-badge positive">+1.2%</span>
-                </div>
-              </div>
-            </div>
-            <div class="chart-container" id="deliveryBarChartContainer">
-              <!-- Rendered via SVG -->
-            </div>
-          </div>
-
-          <!-- Delay Causes Donut Chart -->
-          <div class="card-panel">
-            <div class="panel-header">
-              <h3 class="panel-title">Delay Causes</h3>
-            </div>
-            <div style="display:flex; align-items:center; gap:24px; height:240px;" id="donutChartWrap">
-              <div style="width:160px; height:160px; flex-shrink:0;">
-                <svg viewBox="0 0 42 42" style="width:100%;height:100%;transform:rotate(-90deg);">
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#2563eb" stroke-width="6" stroke-dasharray="42 58" stroke-dashoffset="0"></circle>
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#f97316" stroke-width="6" stroke-dasharray="28 72" stroke-dashoffset="-42"></circle>
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#10b981" stroke-width="6" stroke-dasharray="18 82" stroke-dashoffset="-70"></circle>
-                  <circle cx="21" cy="21" r="15.915" fill="transparent" stroke="#94a3b8" stroke-width="6" stroke-dasharray="12 88" stroke-dashoffset="-88"></circle>
-                </svg>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:10px; font-size:13px; color:var(--text-secondary);">
-                <div style="display:flex; align-items:center; gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#2563eb;"></span><span>Machine Issues <strong>42%</strong></span></div>
-                <div style="display:flex; align-items:center; gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#f97316;"></span><span>Weather <strong>28%</strong></span></div>
-                <div style="display:flex; align-items:center; gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#10b981;"></span><span>Supply Chain <strong>18%</strong></span></div>
-                <div style="display:flex; align-items:center; gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:#94a3b8;"></span><span>Other <strong>12%</strong></span></div>
-              </div>
-            </div>
-          </div>
+        <!-- Dynamic Reports Panel Container -->
+        <div id="reportsPanelContainer">
+          <!-- Rendered dynamically by renderReports() -->
         </div>
       </section>
 
