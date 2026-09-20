@@ -1,0 +1,1132 @@
+{
+  "orders": [
+    {
+      "id": "ORD-00123",
+      "customer": "Acme Corp",
+      "destination": "New York",
+      "product": "Hydraulic Manifold",
+      "process": "MACHINING",
+      "status": "IN_PROGRESS",
+      "eta": "Jan 20",
+      "dueDate": "2026-09-22T18:00:00Z",
+      "quantity": 500,
+      "completedQuantity": 450,
+      "assignedMachineId": "M-001",
+      "risk": {
+        "riskScore": 12,
+        "severity": "HEALTHY",
+        "factors": [
+          "Nominal throughput",
+          "Optimal cycle time"
+        ]
+      }
+    },
+    {
+      "id": "ORD-00126",
+      "customer": "Retail Plus",
+      "destination": "Miami",
+      "product": "Packaging Housing",
+      "process": "MACHINING",
+      "status": "IN_PROGRESS",
+      "eta": "Jan 21",
+      "dueDate": "2026-09-23T20:00:00Z",
+      "quantity": 650,
+      "completedQuantity": 480,
+      "assignedMachineId": "M-004",
+      "risk": {
+        "riskScore": 25,
+        "severity": "HEALTHY",
+        "factors": [
+          "Within SLA variance threshold",
+          "Capacity available"
+        ]
+      }
+    },
+    {
+      "id": "ORD-00127",
+      "customer": "Manufacturing Co",
+      "destination": "Dallas",
+      "product": "Precision Bracket",
+      "process": "MACHINING",
+      "status": "COMPLETED",
+      "eta": "Jan 19",
+      "dueDate": "2026-09-20T10:00:00Z",
+      "quantity": 400,
+      "completedQuantity": 400,
+      "assignedMachineId": "M-005",
+      "risk": {
+        "riskScore": 8,
+        "severity": "HEALTHY",
+        "factors": [
+          "Delivered ahead of commitment",
+          "Quality inspect passed"
+        ]
+      }
+    },
+    {
+      "id": "ORD-1060",
+      "customer": "Kaveri Motors",
+      "product": "Brake Bracket",
+      "process": "MILLING",
+      "quantity": 450,
+      "completedQuantity": 360,
+      "dueDate": "2026-09-24T17:00:00+05:30",
+      "assignedMachineId": "MILL-01",
+      "status": "IN_PROGRESS"
+    },
+    {
+      "id": "ORD-1064",
+      "customer": "Sundar Hydraulics",
+      "product": "Pump Flange",
+      "process": "MACHINING",
+      "quantity": 900,
+      "completedQuantity": 760,
+      "dueDate": "2026-09-23T21:00:00+05:30",
+      "assignedMachineId": "CNC-01",
+      "status": "IN_PROGRESS"
+    },
+    {
+      "id": "ORD-1781",
+      "customer": "ds",
+      "product": "Cad",
+      "process": "MACHINING",
+      "quantity": 500,
+      "completedQuantity": 0,
+      "dueDate": "2026-09-22T11:49:00.000Z",
+      "assignedMachineId": "MILL-01",
+      "status": "IN_PROGRESS",
+      "createdAt": "2026-09-20T11:49:20.053461+00:00",
+      "updatedAt": "2026-09-20T11:49:20.053476+00:00"
+    },
+    {
+      "id": "ORD-1941",
+      "customer": "m",
+      "product": "m",
+      "process": "DRILLING",
+      "quantity": 500,
+      "completedQuantity": 0,
+      "dueDate": "2026-09-22T11:36:00.000Z",
+      "assignedMachineId": "CNC-01",
+      "status": "MAINTENANCE_ESCALATED",
+      "createdAt": "2026-09-20T11:36:26.289901+00:00",
+      "updatedAt": "2026-09-20T11:50:23.810987+00:00"
+    },
+    {
+      "id": "ORD-2001",
+      "customer": "Raytheon Aero",
+      "product": "Titanium Impeller",
+      "process": "MACHINING",
+      "quantity": 600,
+      "completedQuantity": 0,
+      "dueDate": "2026-09-20T11:36:16.821742+00:00",
+      "assignedMachineId": "CNC-02",
+      "status": "MAINTENANCE_ESCALATED",
+      "createdAt": "2026-09-20T11:36:16.821771+00:00",
+      "updatedAt": "2026-09-20T11:50:25.353979+00:00"
+    },
+    {
+      "id": "ORD-1048",
+      "customer": "Apex Pumps",
+      "product": "Impeller Housing",
+      "process": "MACHINING",
+      "quantity": 280,
+      "completedQuantity": 310,
+      "dueDate": "2026-09-30T18:00:00Z",
+      "assignedMachineId": "CNC-02",
+      "status": "COMPLETED",
+      "updatedAt": "2026-09-20T11:54:22.383199+00:00"
+    },
+    {
+      "id": "ORD-1051",
+      "customer": "Metro Fluid Systems",
+      "product": "Valve Body",
+      "process": "MACHINING",
+      "quantity": 680,
+      "completedQuantity": 430,
+      "dueDate": "2026-09-23T13:30:00.000Z",
+      "assignedMachineId": "CNC-04",
+      "status": "AT_RISK",
+      "updatedAt": "2026-09-20T11:59:53.371070+00:00"
+    },
+    {
+      "id": "ORD-00124",
+      "customer": "Global Inc",
+      "destination": "Los Angeles",
+      "product": "Conveyor Drive",
+      "process": "MACHINING",
+      "status": "IN_PROGRESS",
+      "eta": "Jan 18",
+      "dueDate": "2026-09-21T12:00:00Z",
+      "quantity": 800,
+      "completedQuantity": 390,
+      "assignedMachineId": "M-002",
+      "risk": {
+        "riskScore": 51,
+        "severity": "WATCH",
+        "factors": [
+          "Vibration anomaly on M-002",
+          "Schedule buffer depleted"
+        ]
+      },
+      "updatedAt": "2026-09-20T12:25:04.064857+00:00"
+    },
+    {
+      "id": "ORD-00125",
+      "customer": "Tech Solutions",
+      "destination": "Chicago, IL",
+      "product": "Titanium Blisk Assembly",
+      "process": "MACHINING",
+      "status": "INVESTIGATING",
+      "eta": "Jan 22",
+      "orderDate": "Jan 16, 2024",
+      "expectedDelivery": "Jan 22, 2024",
+      "priority": "High",
+      "items": "12 units",
+      "dueDate": "2026-09-21T08:00:00Z",
+      "quantity": 1200,
+      "completedQuantity": 260,
+      "assignedMachineId": "M-003",
+      "risk": {
+        "riskScore": 78,
+        "severity": "HIGH",
+        "factors": [
+          "Machine M-003 at 45% health (STOPPED)",
+          "Weather delay predicted in transit corridor",
+          "Alternative route available via Dallas hub"
+        ]
+      },
+      "updatedAt": "2026-09-20T12:47:42.713670+00:00"
+    }
+  ],
+  "machines": [
+    {
+      "id": "M-001",
+      "name": "Packaging Line A1",
+      "location": "Plant 1 - Line A",
+      "model": "PK-5000",
+      "status": "AVAILABLE",
+      "healthScore": 98,
+      "capacityPerHour": 120,
+      "installed": "Jan 15, 2024",
+      "lastMaintenance": "Feb 1, 2024",
+      "nextMaintenance": "Mar 15, 2024",
+      "uptime": "99.2%",
+      "temperature": 42,
+      "vibration": 0.2,
+      "powerUsage": 12.4,
+      "throughput": 120,
+      "capabilities": [
+        "PACKAGING",
+        "MACHINING",
+        "AUTOMATION"
+      ],
+      "lastEventAt": "2026-09-20T11:48:00Z"
+    },
+    {
+      "id": "M-002",
+      "name": "Conveyor Belt B3",
+      "location": "Plant 1",
+      "status": "DEGRADED",
+      "healthScore": 72,
+      "capacityPerHour": 95,
+      "installed": "Nov 10, 2023",
+      "lastMaintenance": "Jan 20, 2024",
+      "nextMaintenance": "Mar 01, 2024",
+      "uptime": "96.8%",
+      "temperature": 58,
+      "vibration": 0.8,
+      "powerUsage": 18.2,
+      "throughput": 85,
+      "capabilities": [
+        "CONVEYANCE",
+        "MACHINING"
+      ],
+      "lastEventAt": "2026-09-20T11:38:00Z"
+    },
+    {
+      "id": "M-003",
+      "name": "Robot Arm C2",
+      "location": "Plant 2",
+      "status": "STOPPED",
+      "healthScore": 45,
+      "capacityPerHour": 80,
+      "installed": "Aug 04, 2023",
+      "lastMaintenance": "Dec 12, 2023",
+      "nextMaintenance": "Feb 10, 2024",
+      "uptime": "88.4%",
+      "temperature": 74,
+      "vibration": 2.4,
+      "powerUsage": 24.1,
+      "throughput": 0,
+      "capabilities": [
+        "MATERIAL_HANDLING",
+        "MACHINING",
+        "ROBOTICS"
+      ],
+      "lastEventAt": "2026-09-20T11:22:00Z"
+    },
+    {
+      "id": "M-004",
+      "name": "Cooling System D1",
+      "location": "Plant 3",
+      "status": "AVAILABLE",
+      "healthScore": 95,
+      "capacityPerHour": 150,
+      "installed": "Feb 01, 2024",
+      "lastMaintenance": "Feb 15, 2024",
+      "nextMaintenance": "Apr 15, 2024",
+      "uptime": "99.8%",
+      "temperature": 28,
+      "vibration": 0.1,
+      "powerUsage": 9.2,
+      "throughput": 150,
+      "capabilities": [
+        "CHILLING",
+        "MACHINING"
+      ],
+      "lastEventAt": "2026-09-20T10:50:00Z"
+    },
+    {
+      "id": "M-005",
+      "name": "Assembly Unit E5",
+      "location": "Plant 3",
+      "status": "AVAILABLE",
+      "healthScore": 89,
+      "capacityPerHour": 110,
+      "installed": "Oct 15, 2023",
+      "lastMaintenance": "Jan 10, 2024",
+      "nextMaintenance": "Mar 25, 2024",
+      "uptime": "97.5%",
+      "temperature": 36,
+      "vibration": 0.3,
+      "powerUsage": 14.8,
+      "throughput": 110,
+      "capabilities": [
+        "ASSEMBLY",
+        "MACHINING"
+      ],
+      "lastEventAt": "2026-09-20T09:50:00Z"
+    },
+    {
+      "id": "CNC-09",
+      "name": "Mazak 5-Axis Variaxis",
+      "type": "5-Axis Center",
+      "status": "AVAILABLE",
+      "capacityPerHour": 38,
+      "capabilities": [
+        "MACHINING",
+        "MILLING"
+      ],
+      "lastEventAt": "2026-09-20T11:36:31.402313+00:00"
+    },
+    {
+      "id": "MILL-01",
+      "name": "MILL-01",
+      "type": "Vertical Mill",
+      "status": "STOPPED",
+      "capacityPerHour": 22,
+      "capabilities": [
+        "MILLING"
+      ],
+      "currentOrderId": "ORD-1781",
+      "lastEventAt": "2026-09-20T11:50:07.896534+00:00"
+    },
+    {
+      "id": "CNC-02",
+      "name": "CNC-02",
+      "type": "CNC Lathe",
+      "status": "RUNNING",
+      "capacityPerHour": 28,
+      "capabilities": [
+        "MACHINING"
+      ],
+      "lastEventAt": "2026-09-20T11:23:30.005843+00:00",
+      "currentOrderId": "ORD-1048"
+    },
+    {
+      "id": "CNC-07",
+      "name": "CNC-07",
+      "type": "CNC Mill",
+      "status": "AVAILABLE",
+      "capacityPerHour": 31,
+      "capabilities": [
+        "MACHINING"
+      ],
+      "currentOrderId": null,
+      "lastEventAt": "2026-09-20T11:56:27.365670+00:00"
+    },
+    {
+      "id": "CNC-01",
+      "name": "CNC-01",
+      "type": "CNC Mill",
+      "status": "AVAILABLE",
+      "capacityPerHour": 30,
+      "capabilities": [
+        "MACHINING"
+      ],
+      "currentOrderId": null,
+      "lastEventAt": "2026-09-20T11:57:16.799996+00:00"
+    },
+    {
+      "id": "CNC-04",
+      "name": "CNC-04",
+      "type": "CNC Mill",
+      "status": "STOPPED",
+      "capacityPerHour": 34,
+      "capabilities": [
+        "MACHINING"
+      ],
+      "lastEventAt": "2026-09-20T12:04:13.580028+00:00",
+      "currentOrderId": "ORD-1051"
+    }
+  ],
+  "events": [
+    {
+      "id": "EVT-1001",
+      "orderId": "ORD-1048",
+      "machineId": "CNC-04",
+      "type": "MACHINE_STOP",
+      "source": "operator",
+      "timestamp": "2026-09-20T10:40:00+05:30",
+      "durationMinutes": 65,
+      "description": "Coolant pressure low; machine stopped."
+    },
+    {
+      "id": "EVT-1002",
+      "orderId": "ORD-1048",
+      "type": "QUALITY_REWORK",
+      "source": "quality",
+      "timestamp": "2026-09-20T11:05:00+05:30",
+      "reworkUnits": 17,
+      "description": "Bore diameter out of tolerance."
+    },
+    {
+      "id": "EVT-1003",
+      "orderId": "ORD-1048",
+      "type": "MATERIAL_DELAY",
+      "source": "stores",
+      "timestamp": "2026-09-20T08:20:00+05:30",
+      "delayHours": 4,
+      "description": "Raw forging batch release delayed."
+    },
+    {
+      "id": "EVT-1010",
+      "orderId": "ORD-1051",
+      "machineId": "CNC-02",
+      "type": "MACHINE_DEGRADED",
+      "source": "operator",
+      "timestamp": "2026-09-20T09:30:00+05:30",
+      "durationMinutes": 25,
+      "description": "Spindle vibration elevated."
+    },
+    {
+      "id": "EVT-1020",
+      "orderId": "ORD-1060",
+      "machineId": "MILL-01",
+      "type": "MACHINE_RECOVERED",
+      "source": "maintenance",
+      "timestamp": "2026-09-20T07:10:00+05:30",
+      "description": "Routine maintenance completed."
+    },
+    {
+      "id": "EVT-1030",
+      "orderId": "ORD-1064",
+      "type": "QUALITY_REWORK",
+      "source": "quality",
+      "timestamp": "2026-09-20T06:50:00+05:30",
+      "reworkUnits": 5,
+      "description": "Surface finish below specification."
+    },
+    {
+      "orderId": "ORD-1048",
+      "machineId": "CNC-04",
+      "type": "MACHINE_STOP",
+      "source": "operator",
+      "durationMinutes": 25,
+      "delayHours": 0,
+      "reworkUnits": 0,
+      "description": "Operator reported machine stop.",
+      "id": "EVT-A08E377470",
+      "timestamp": "2026-09-20T11:07:19.798264+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1048",
+      "machineId": "CNC-04",
+      "type": "MACHINE_STOP",
+      "source": "operator",
+      "durationMinutes": 25,
+      "delayHours": 0,
+      "reworkUnits": 0,
+      "description": "Operator reported machine stop.",
+      "id": "EVT-43D5E045C7",
+      "timestamp": "2026-09-20T11:07:27.925160+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1051",
+      "machineId": "CNC-02",
+      "type": "MACHINE_STOP",
+      "source": "operator-edge-terminal",
+      "durationMinutes": 25,
+      "delayHours": 8,
+      "reworkUnits": 0,
+      "description": "Operator reported machine stop.",
+      "id": "EVT-A8C1C74D94",
+      "timestamp": "2026-09-20T11:23:30.005843+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1048",
+      "machineId": "CNC-07",
+      "type": "MACHINE_STOP",
+      "source": "operator",
+      "durationMinutes": 25,
+      "delayHours": 0,
+      "reworkUnits": 0,
+      "description": "Operator reported machine stop.",
+      "id": "EVT-0AB4FCEB5F",
+      "timestamp": "2026-09-20T11:24:44.174150+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1941",
+      "machineId": "CNC-01",
+      "type": "MACHINE_STOP",
+      "source": "operator-edge-terminal",
+      "durationMinutes": 25,
+      "delayHours": 0,
+      "reworkUnits": 0,
+      "description": "Operator reported machine stop.",
+      "id": "EVT-33CC76179E",
+      "timestamp": "2026-09-20T11:36:45.318459+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1051",
+      "machineId": "CNC-04",
+      "type": "MACHINE_STOP",
+      "durationMinutes": 45,
+      "description": "Unplanned machine stoppage simulated on CNC-04",
+      "source": "digital-twin-fleet",
+      "id": "EVT-90F3E287A5",
+      "timestamp": "2026-09-20T11:49:40.509440+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1048",
+      "machineId": "CNC-07",
+      "type": "MACHINE_RECOVERED",
+      "durationMinutes": 0,
+      "description": "Maintenance team cleared and restored CNC-07 online",
+      "source": "digital-twin-fleet",
+      "id": "EVT-5147C62A58",
+      "timestamp": "2026-09-20T11:49:41.809517+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1781",
+      "machineId": "MILL-01",
+      "type": "MACHINE_STOP",
+      "source": "operator-edge-terminal",
+      "durationMinutes": 25,
+      "delayHours": 0,
+      "reworkUnits": 0,
+      "description": "Operator reported machine stop.",
+      "id": "EVT-DC611D2FC4",
+      "timestamp": "2026-09-20T11:50:07.896534+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1051",
+      "machineId": "CNC-04",
+      "type": "MACHINE_STOP",
+      "source": "operator-edge-terminal",
+      "durationMinutes": 45,
+      "delayHours": 0,
+      "reworkUnits": 0,
+      "description": "Emergency stoppage on CNC-04 for ORD-1051",
+      "id": "EVT-68197CD76B",
+      "timestamp": "2026-09-20T12:04:13.580028+00:00",
+      "plantId": "PLANT-001"
+    },
+    {
+      "orderId": "ORD-1051",
+      "machineId": "CNC-04",
+      "type": "QUALITY_REWORK",
+      "source": "operator-edge-terminal",
+      "durationMinutes": 0,
+      "delayHours": 0,
+      "reworkUnits": 30,
+      "description": "Batch tolerance rework surge on Valve Body",
+      "id": "EVT-03E1FA3D12",
+      "timestamp": "2026-09-20T12:04:17.561256+00:00",
+      "plantId": "PLANT-001"
+    }
+  ],
+  "risks": [
+    {
+      "orderId": "ORD-1060",
+      "riskScore": 5.7,
+      "severity": "HEALTHY",
+      "dueHours": 96.38,
+      "progressPercent": 80.0,
+      "factors": [
+        "ML predicts 11% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.112,
+        "failureProbability": 0.05,
+        "anomalyScore": 0.1
+      },
+      "calculatedAt": "2026-09-20T11:07:10.003296+00:00"
+    },
+    {
+      "orderId": "ORD-1781",
+      "riskScore": 57.6,
+      "severity": "WATCH",
+      "dueHours": 47.98,
+      "progressPercent": 0.0,
+      "factors": [
+        "Assigned machine is stopped",
+        "25 minutes of recent downtime/degradation",
+        "ML predicts 46% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.4589,
+        "failureProbability": 0.4625,
+        "anomalyScore": 0.1764
+      },
+      "calculatedAt": "2026-09-20T11:50:07.903218+00:00"
+    },
+    {
+      "orderId": "ORD-2001",
+      "riskScore": 50.7,
+      "severity": "WATCH",
+      "dueHours": -0.24,
+      "progressPercent": 0.0,
+      "factors": [
+        "Only 0 hours remain to due time",
+        "ML predicts 32% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.32,
+        "failureProbability": 0.05,
+        "anomalyScore": 0.1
+      },
+      "calculatedAt": "2026-09-20T11:50:25.364985+00:00"
+    },
+    {
+      "orderId": "ORD-1048",
+      "riskScore": 50.2,
+      "severity": "WATCH",
+      "dueHours": 246.09,
+      "progressPercent": 100.0,
+      "factors": [
+        "140 minutes of recent downtime/degradation",
+        "17 units routed to rework",
+        "Material delay of 4.0 hours",
+        "ML predicts 36% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.3633,
+        "failureProbability": 0.4091,
+        "anomalyScore": 0.593
+      },
+      "calculatedAt": "2026-09-20T11:54:22.381556+00:00"
+    },
+    {
+      "orderId": "ORD-1064",
+      "riskScore": 5.6,
+      "severity": "HEALTHY",
+      "dueHours": 75.55,
+      "progressPercent": 84.4,
+      "factors": [
+        "5 units routed to rework",
+        "ML predicts 11% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.106,
+        "failureProbability": 0.0508,
+        "anomalyScore": 0.1014
+      },
+      "calculatedAt": "2026-09-20T11:57:16.803692+00:00"
+    },
+    {
+      "orderId": "ORD-1941",
+      "riskScore": 21.1,
+      "severity": "HEALTHY",
+      "dueHours": 47.65,
+      "progressPercent": 0.0,
+      "factors": [
+        "25 minutes of recent downtime/degradation",
+        "ML predicts 28% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.2789,
+        "failureProbability": 0.1125,
+        "anomalyScore": 0.1764
+      },
+      "calculatedAt": "2026-09-20T11:57:16.804794+00:00"
+    },
+    {
+      "orderId": "ORD-1051",
+      "riskScore": 76.3,
+      "severity": "HIGH",
+      "dueHours": 73.43,
+      "progressPercent": 63.2,
+      "factors": [
+        "Assigned machine is stopped",
+        "140 minutes of recent downtime/degradation",
+        "30 units routed to rework",
+        "ML predicts 55% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.5454,
+        "failureProbability": 0.7566,
+        "anomalyScore": 0.5388
+      },
+      "calculatedAt": "2026-09-20T12:04:17.566669+00:00"
+    },
+    {
+      "orderId": "ORD-00123",
+      "riskScore": 5.1,
+      "severity": "HEALTHY",
+      "dueHours": 53.58,
+      "progressPercent": 90.0,
+      "factors": [
+        "ML predicts 10% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.096,
+        "failureProbability": 0.05,
+        "anomalyScore": 0.1
+      },
+      "calculatedAt": "2026-09-20T12:25:04.059670+00:00"
+    },
+    {
+      "orderId": "ORD-00124",
+      "riskScore": 36.3,
+      "severity": "WATCH",
+      "dueHours": 23.58,
+      "progressPercent": 48.8,
+      "factors": [
+        "Assigned machine is degraded",
+        "Only 23.6 hours remain to due time",
+        "ML predicts 26% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.2624,
+        "failureProbability": 0.2425,
+        "anomalyScore": 0.1
+      },
+      "calculatedAt": "2026-09-20T12:25:04.063048+00:00"
+    },
+    {
+      "orderId": "ORD-00125",
+      "riskScore": 71.5,
+      "severity": "HIGH",
+      "dueHours": 19.58,
+      "progressPercent": 21.7,
+      "factors": [
+        "Assigned machine is stopped",
+        "Only 19.6 hours remain to due time",
+        "ML predicts 40% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.4001,
+        "failureProbability": 0.4,
+        "anomalyScore": 0.1
+      },
+      "calculatedAt": "2026-09-20T12:25:04.076378+00:00"
+    },
+    {
+      "orderId": "ORD-00126",
+      "riskScore": 6.0,
+      "severity": "HEALTHY",
+      "dueHours": 79.58,
+      "progressPercent": 73.8,
+      "factors": [
+        "ML predicts 12% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.1218,
+        "failureProbability": 0.05,
+        "anomalyScore": 0.1
+      },
+      "calculatedAt": "2026-09-20T12:25:04.077941+00:00"
+    },
+    {
+      "orderId": "ORD-00127",
+      "riskScore": 30.1,
+      "severity": "HEALTHY",
+      "dueHours": -2.42,
+      "progressPercent": 100.0,
+      "factors": [
+        "Only 0 hours remain to due time",
+        "ML predicts 16% delay probability"
+      ],
+      "prediction": {
+        "delayProbability": 0.16,
+        "failureProbability": 0.05,
+        "anomalyScore": 0.1
+      },
+      "calculatedAt": "2026-09-20T12:25:04.081261+00:00"
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "REC-00125",
+      "orderId": "ORD-00125",
+      "actionType": "REASSIGN_MACHINE",
+      "category": "Rerouting",
+      "title": "Reroute Order ORD-00125",
+      "subtitle": "Tech Solutions \u00b7 Potential 36h delay reduction",
+      "severity": "HIGH",
+      "target": "M-004",
+      "rationale": "Reroute remaining 940 units to M-004 (Dallas Hub) to avoid 36h bottleneck on stopped workstation M-003.",
+      "confidence": 0.94,
+      "status": "OPEN",
+      "timeAgo": "2 mins ago",
+      "createdAt": "2026-09-20T11:48:00Z"
+    },
+    {
+      "id": "REC-M003",
+      "orderId": "ORD-00125",
+      "actionType": "ESCALATE_MAINTENANCE",
+      "category": "Maintenance",
+      "title": "Schedule Maintenance M-003",
+      "subtitle": "Robot Arm C2 \u00b7 Preventive maintenance recommended",
+      "severity": "MEDIUM",
+      "target": "M-003",
+      "rationale": "Thermal bearing surge detected. Dispatching technician for lubrication and torque alignment.",
+      "confidence": 0.88,
+      "status": "OPEN",
+      "timeAgo": "15 mins ago",
+      "createdAt": "2026-09-20T11:35:00Z"
+    },
+    {
+      "id": "REC-ORD128",
+      "orderId": "ORD-00126",
+      "actionType": "EXPEDITE_SHIPMENT",
+      "category": "Exception",
+      "title": "Expedite Shipment ORD-00128",
+      "subtitle": "Retail Plus \u00b7 Customer priority request",
+      "severity": "HIGH",
+      "target": "Express Air Line",
+      "rationale": "Customer priority upgrade requested. Switch carrier to priority express freight.",
+      "confidence": 0.91,
+      "status": "OPEN",
+      "timeAgo": "1 hour ago",
+      "createdAt": "2026-09-20T10:50:00Z"
+    },
+    {
+      "id": "REC-M007",
+      "orderId": "ORD-00123",
+      "actionType": "OVERRIDE_ALERT",
+      "category": "Exception",
+      "title": "Override Risk Alert M-007",
+      "subtitle": "Sensor anomaly detected \u00b7 Manual review required",
+      "severity": "LOW",
+      "target": "Sensor Grid 7",
+      "rationale": "Sensor telemetry calibrated. Noise detected during startup cycle; manual supervisor signoff.",
+      "confidence": 0.79,
+      "status": "OPEN",
+      "timeAgo": "2 hours ago",
+      "createdAt": "2026-09-20T09:50:00Z"
+    },
+    {
+      "id": "REC-8D696B52",
+      "orderId": "ORD-1048",
+      "actionType": "REASSIGN_MACHINE",
+      "target": "CNC-07",
+      "rationale": "Reassign remaining Impeller Housing work from CNC-04 to CNC-07 to restore available capacity.",
+      "riskScore": 74.5,
+      "confidence": 0.9,
+      "status": "EXECUTED",
+      "createdAt": "2026-09-20T11:07:09.998755+00:00"
+    },
+    {
+      "id": "REC-43C55C8D",
+      "orderId": "ORD-1051",
+      "actionType": "REASSIGN_MACHINE",
+      "target": "CNC-04",
+      "rationale": "Reassign remaining Valve Body work from CNC-02 to CNC-04 to restore available capacity.",
+      "riskScore": 54.6,
+      "confidence": 0.83,
+      "status": "EXECUTED",
+      "createdAt": "2026-09-20T11:23:30.015484+00:00"
+    },
+    {
+      "id": "REC-4557047B",
+      "orderId": "ORD-1051",
+      "actionType": "REASSIGN_MACHINE",
+      "target": "CNC-09",
+      "rationale": "Reassign remaining Valve Body work from CNC-04 to CNC-09 to restore available capacity.",
+      "riskScore": 64.8,
+      "confidence": 0.87,
+      "status": "OPEN",
+      "createdAt": "2026-09-20T11:49:40.516227+00:00"
+    },
+    {
+      "id": "REC-04549937",
+      "orderId": "ORD-1781",
+      "actionType": "REASSIGN_MACHINE",
+      "target": "CNC-09",
+      "rationale": "Reassign remaining Cad work from MILL-01 to CNC-09 to restore available capacity.",
+      "riskScore": 57.6,
+      "confidence": 0.84,
+      "status": "OPEN",
+      "createdAt": "2026-09-20T11:50:07.909764+00:00"
+    },
+    {
+      "id": "REC-237E2599",
+      "orderId": "ORD-1048",
+      "actionType": "REASSIGN_MACHINE",
+      "target": "CNC-02",
+      "rationale": "Reassign remaining Impeller Housing work from CNC-07 to CNC-02 to restore available capacity.",
+      "riskScore": 91.5,
+      "confidence": 0.96,
+      "status": "EXECUTED",
+      "createdAt": "2026-09-20T11:24:44.179889+00:00"
+    },
+    {
+      "id": "REC-47027F37",
+      "orderId": "ORD-1941",
+      "actionType": "ESCALATE_MAINTENANCE",
+      "target": "CNC-01",
+      "rationale": "Escalate CNC-01 for maintenance because no compatible spare machine is currently available.",
+      "riskScore": 57.6,
+      "confidence": 0.84,
+      "status": "EXECUTED",
+      "createdAt": "2026-09-20T11:36:45.328220+00:00"
+    },
+    {
+      "id": "REC-AF477F3D",
+      "orderId": "ORD-2001",
+      "actionType": "ESCALATE_MAINTENANCE",
+      "target": "CNC-02",
+      "rationale": "Escalate CNC-02 for maintenance because no compatible spare machine is currently available.",
+      "riskScore": 50.7,
+      "confidence": 0.82,
+      "status": "EXECUTED",
+      "createdAt": "2026-09-20T11:36:16.835780+00:00"
+    },
+    {
+      "id": "REC-2DFF1E2C",
+      "orderId": "ORD-1048",
+      "actionType": "REASSIGN_MACHINE",
+      "target": "CNC-09",
+      "rationale": "Reassign remaining Impeller Housing work from CNC-02 to CNC-09 to restore available capacity.",
+      "riskScore": 50.2,
+      "confidence": 0.82,
+      "status": "OPEN",
+      "createdAt": "2026-09-20T11:54:22.384733+00:00"
+    },
+    {
+      "id": "REC-20BB732A",
+      "orderId": "ORD-00124",
+      "actionType": "REASSIGN_MACHINE",
+      "target": "M-001",
+      "rationale": "Reassign remaining Conveyor Drive work from M-002 to M-001 to restore available capacity.",
+      "riskScore": 36.3,
+      "confidence": 0.77,
+      "status": "OPEN",
+      "createdAt": "2026-09-20T12:25:04.071402+00:00"
+    }
+  ],
+  "actions": [
+    {
+      "id": "ACT-512A045C",
+      "orderId": "ORD-1048",
+      "recommendationId": "REC-8D696B52",
+      "type": "REASSIGN_MACHINE",
+      "target": "CNC-07",
+      "status": "COMPLETED",
+      "approvedBy": "SUP-001",
+      "approvedAt": "2026-09-20T11:07:33.224703+00:00",
+      "executedAt": "2026-09-20T11:07:33.233808+00:00"
+    },
+    {
+      "id": "ACT-19FAFDBB",
+      "orderId": "ORD-1051",
+      "recommendationId": "REC-43C55C8D",
+      "type": "REASSIGN_MACHINE",
+      "target": "CNC-04",
+      "status": "COMPLETED",
+      "approvedBy": "SUPERVISOR-DIR-01",
+      "approvedAt": "2026-09-20T11:23:41.261887+00:00",
+      "executedAt": "2026-09-20T11:23:41.272714+00:00"
+    },
+    {
+      "id": "ACT-20192437",
+      "orderId": "ORD-1048",
+      "recommendationId": "REC-237E2599",
+      "type": "REASSIGN_MACHINE",
+      "target": "CNC-02",
+      "status": "COMPLETED",
+      "approvedBy": "SUPERVISOR-DIR-01",
+      "approvedAt": "2026-09-20T11:50:22.418322+00:00",
+      "executedAt": "2026-09-20T11:50:22.428223+00:00"
+    },
+    {
+      "id": "ACT-DD222BBD",
+      "orderId": "ORD-1941",
+      "recommendationId": "REC-47027F37",
+      "type": "ESCALATE_MAINTENANCE",
+      "target": "CNC-01",
+      "status": "COMPLETED",
+      "approvedBy": "SUPERVISOR-DIR-01",
+      "approvedAt": "2026-09-20T11:50:23.807711+00:00",
+      "executedAt": "2026-09-20T11:50:23.815962+00:00"
+    },
+    {
+      "id": "ACT-C8787E4A",
+      "orderId": "ORD-2001",
+      "recommendationId": "REC-AF477F3D",
+      "type": "ESCALATE_MAINTENANCE",
+      "target": "CNC-02",
+      "status": "COMPLETED",
+      "approvedBy": "SUPERVISOR-DIR-01",
+      "approvedAt": "2026-09-20T11:50:25.349833+00:00",
+      "executedAt": "2026-09-20T11:50:25.359220+00:00"
+    }
+  ],
+  "audit": [
+    {
+      "id": "AUD-E65ACAF9",
+      "timestamp": "2026-09-20T11:07:33.238917+00:00",
+      "actor": "SUP-001",
+      "event": "ACTION_APPROVED_AND_EXECUTED",
+      "actionId": "ACT-512A045C",
+      "orderId": "ORD-1048"
+    },
+    {
+      "id": "AUD-48CFE237",
+      "timestamp": "2026-09-20T11:23:41.278565+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ACTION_APPROVED_AND_EXECUTED",
+      "actionId": "ACT-19FAFDBB",
+      "orderId": "ORD-1051"
+    },
+    {
+      "id": "AUD-F5DD79B1",
+      "timestamp": "2026-09-20T11:36:16.828658+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ORDER_CREATED",
+      "orderId": "ORD-2001"
+    },
+    {
+      "id": "AUD-BE9F4B76",
+      "timestamp": "2026-09-20T11:36:26.296008+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ORDER_CREATED",
+      "orderId": "ORD-1941"
+    },
+    {
+      "id": "AUD-B8B95158",
+      "timestamp": "2026-09-20T11:36:31.403681+00:00",
+      "actor": "FACILITY-ENG-01",
+      "event": "MACHINE_REGISTERED",
+      "orderId": "CNC-09"
+    },
+    {
+      "id": "AUD-890C347B",
+      "timestamp": "2026-09-20T11:49:20.102926+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ORDER_CREATED",
+      "orderId": "ORD-1781"
+    },
+    {
+      "id": "AUD-07ECF4A6",
+      "timestamp": "2026-09-20T11:50:22.437266+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ACTION_APPROVED_AND_EXECUTED",
+      "actionId": "ACT-20192437",
+      "orderId": "ORD-1048"
+    },
+    {
+      "id": "AUD-AA3BA217",
+      "timestamp": "2026-09-20T11:50:23.824717+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ACTION_APPROVED_AND_EXECUTED",
+      "actionId": "ACT-DD222BBD",
+      "orderId": "ORD-1941"
+    },
+    {
+      "id": "AUD-626EF903",
+      "timestamp": "2026-09-20T11:50:25.369995+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ACTION_APPROVED_AND_EXECUTED",
+      "actionId": "ACT-C8787E4A",
+      "orderId": "ORD-2001"
+    },
+    {
+      "id": "AUD-C88897D1",
+      "timestamp": "2026-09-20T11:54:22.369258+00:00",
+      "actor": "MAINTENANCE-LEAD",
+      "event": "MACHINE_TRANSITION",
+      "action": "DIAGNOSE",
+      "orderId": "CNC-07",
+      "details": "Machine transitioned to DIAGNOSING via DIAGNOSE"
+    },
+    {
+      "id": "AUD-19A0D11A",
+      "timestamp": "2026-09-20T11:54:22.379134+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ORDER_RESCHEDULED",
+      "orderId": "ORD-1048"
+    },
+    {
+      "id": "AUD-ECF84EDF",
+      "timestamp": "2026-09-20T11:56:27.367515+00:00",
+      "actor": "MAINTENANCE-LEAD",
+      "event": "MACHINE_TRANSITION",
+      "action": "FIX",
+      "orderId": "CNC-07",
+      "details": "Machine transitioned to AVAILABLE via FIX"
+    },
+    {
+      "id": "AUD-19904667",
+      "timestamp": "2026-09-20T11:57:16.802393+00:00",
+      "actor": "MAINTENANCE-LEAD",
+      "event": "MACHINE_TRANSITION",
+      "action": "RECOVER",
+      "orderId": "CNC-01",
+      "details": "Machine transitioned to AVAILABLE via RECOVER"
+    },
+    {
+      "id": "AUD-66D108C0",
+      "timestamp": "2026-09-20T11:59:53.367689+00:00",
+      "actor": "SUPERVISOR-DIR-01",
+      "event": "ORDER_RESCHEDULED",
+      "orderId": "ORD-1051"
+    }
+  ],
+  "agent_sessions": [
+    {
+      "id": "SES-74F6F023",
+      "orderId": "ORD-1048",
+      "question": "Why is ORD-1048 at risk?",
+      "response": "ORD-1048 is WATCH at 50/100 risk score.\n\nProduction Health: 310/280 completed (110.7%). Requires 0.0 hrs of machining with 246.1 hrs until customer due date.\n\nTelemetry Evidence: 140 minutes of recent downtime/degradation; 17 units routed to rework; Material delay of 4.0 hours; ML predicts 36% delay probability.\n\nAutonomous Recommendation: Move remaining 0 units from CNC-02 to CNC-09 (28 units/hr).\n\nHuman approval is required before execution in Recovery Queue.",
+      "userId": "SUPERVISOR-DIR-01",
+      "timestamp": "2026-09-20T11:54:28.542420+00:00"
+    },
+    {
+      "id": "SES-82B17E1C",
+      "orderId": "ORD-00125",
+      "question": "What maintenance should I schedule?",
+      "response": "ORD-00125 is HIGH at 72/100 risk score.\n\nProduction Health: 260/1200 completed (21.7%). Requires 11.8 hrs of machining with 19.2 hrs until customer due date.\n\nTelemetry Evidence: Assigned machine is stopped; Only 19.6 hours remain to due time; ML predicts 40% delay probability.\n\nAutonomous Recommendation: Move remaining 940 units from M-003 to M-001 (28 units/hr).\n\nHuman approval is required before execution in Recovery Queue.",
+      "userId": "SUPERVISOR-DIR-01",
+      "timestamp": "2026-09-20T12:47:42.717684+00:00"
+    },
+    {
+      "id": "SES-9005F93D",
+      "orderId": "ORD-00125",
+      "question": "What maintenance should I schedule?",
+      "response": "ORD-00125 is HIGH at 72/100 risk score.\n\nProduction Health: 260/1200 completed (21.7%). Requires 11.8 hrs of machining with 19.2 hrs until customer due date.\n\nTelemetry Evidence: Assigned machine is stopped; Only 19.6 hours remain to due time; ML predicts 40% delay probability.\n\nAutonomous Recommendation: Move remaining 940 units from M-003 to M-001 (28 units/hr).\n\nHuman approval is required before execution in Recovery Queue.",
+      "userId": "SUPERVISOR-DIR-01",
+      "timestamp": "2026-09-20T12:47:45.937761+00:00"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "orders": [
+    {"id":"ORD-1048","customer":"Apex Pumps","product":"Impeller Housing","process":"MACHINING","quantity":1000,"completedQuantity":310,"dueDate":"2026-09-21T17:00:00+05:30","assignedMachineId":"CNC-04","status":"IN_PROGRESS"},
+    {"id":"ORD-1051","customer":"Metro Fluid Systems","product":"Valve Body","process":"MACHINING","quantity":700,"completedQuantity":430,"dueDate":"2026-09-22T19:00:00+05:30","assignedMachineId":"CNC-02","status":"IN_PROGRESS"},
+    {"id":"ORD-1060","customer":"Kaveri Motors","product":"Brake Bracket","process":"MILLING","quantity":450,"completedQuantity":360,"dueDate":"2026-09-24T17:00:00+05:30","assignedMachineId":"MILL-01","status":"IN_PROGRESS"},
+    {"id":"ORD-1064","customer":"Sundar Hydraulics","product":"Pump Flange","process":"MACHINING","quantity":900,"completedQuantity":760,"dueDate":"2026-09-23T21:00:00+05:30","assignedMachineId":"CNC-01","status":"IN_PROGRESS"}
+  ],
+  "machines": [
+    {"id":"CNC-04","name":"CNC-04","type":"CNC Mill","status":"STOPPED","capacityPerHour":34,"capabilities":["MACHINING"]},
+    {"id":"CNC-07","name":"CNC-07","type":"CNC Mill","status":"AVAILABLE","capacityPerHour":31,"capabilities":["MACHINING"]},
+    {"id":"CNC-02","name":"CNC-02","type":"CNC Lathe","status":"RUNNING","capacityPerHour":28,"capabilities":["MACHINING"]},
+    {"id":"CNC-01","name":"CNC-01","type":"CNC Mill","status":"RUNNING","capacityPerHour":30,"capabilities":["MACHINING"]},
+    {"id":"MILL-01","name":"MILL-01","type":"Vertical Mill","status":"RUNNING","capacityPerHour":22,"capabilities":["MILLING"]}
+  ],
+  "events": [
+    {"id":"EVT-1001","orderId":"ORD-1048","machineId":"CNC-04","type":"MACHINE_STOP","source":"operator","timestamp":"2026-09-20T10:40:00+05:30","durationMinutes":65,"description":"Coolant pressure low; machine stopped."},
+    {"id":"EVT-1002","orderId":"ORD-1048","type":"QUALITY_REWORK","source":"quality","timestamp":"2026-09-20T11:05:00+05:30","reworkUnits":17,"description":"Bore diameter out of tolerance."},
+    {"id":"EVT-1003","orderId":"ORD-1048","type":"MATERIAL_DELAY","source":"stores","timestamp":"2026-09-20T08:20:00+05:30","delayHours":4,"description":"Raw forging batch release delayed."},
+    {"id":"EVT-1010","orderId":"ORD-1051","machineId":"CNC-02","type":"MACHINE_DEGRADED","source":"operator","timestamp":"2026-09-20T09:30:00+05:30","durationMinutes":25,"description":"Spindle vibration elevated."},
+    {"id":"EVT-1020","orderId":"ORD-1060","machineId":"MILL-01","type":"MACHINE_RECOVERED","source":"maintenance","timestamp":"2026-09-20T07:10:00+05:30","description":"Routine maintenance completed."},
+    {"id":"EVT-1030","orderId":"ORD-1064","type":"QUALITY_REWORK","source":"quality","timestamp":"2026-09-20T06:50:00+05:30","reworkUnits":5,"description":"Surface finish below specification."}
+  ]
+}
