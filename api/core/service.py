@@ -151,10 +151,18 @@ class OpsRelayService:
         return [m for m in self.store.list_machines() if m["id"] != assigned and m.get("status") == "AVAILABLE" and m.get("capabilities", []) and order.get("process") in m.get("capabilities", [])]
 
     def build_context(self, order_id: str) -> dict[str, Any]:
-        order = self.store.get_order(order_id)
-        if not order: return {"order": None}
+        order = self.store.get_order(order_id) if order_id else None
+        if not order:
+            dash = self.build_dashboard_context()
+            return {
+                "order": None,
+                "orders": dash.get("orders", []),
+                "allMachines": self.store.list_machines(),
+                "recentEvents": dash.get("recentEvents", []),
+            }
         return {
             "order": order,
+            "orders": self.store.list_orders(),
             "risk": self.get_or_calculate_risk(order_id),
             "availableMachines": self.available_machines(order_id),
             "allMachines": self.store.list_machines(),

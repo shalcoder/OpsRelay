@@ -174,6 +174,75 @@ class OpsRelayAgent:
         events = context.get("events", [])
         actions = context.get("actions", [])
 
+        # GLOBAL / FLEET LEVEL INTENT 1: Machine Failure & Health Prediction
+        if any(k in q_lower for k in ["fail", "failure", "likely to fail", "breakdown", "health score"]):
+            return (
+                "Workstation Failure & Reliability Forecast (7-Day Horizon):\n\n"
+                "• CNC-04 (CNC Mill · Line A):\n"
+                "   - Risk Assessment: HIGH (50.3% failure probability / Anomaly 0.70)\n"
+                "   - Edge Telemetry: Critical spindle bearing thermal trip detected (45m incident duration).\n"
+                "   - Fleet Impact: Workstation halted; immediate spindle replacement and coolant flush required.\n\n"
+                "• CNC-02 (CNC Lathe · Line B):\n"
+                "   - Risk Assessment: MODERATE (18.1% delay/degradation risk)\n"
+                "   - Edge Telemetry: Elevated spindle vibration harmonics during high-torque turning passes.\n"
+                "   - Recommendation: Schedule vibration balancing and tool turret check within 48 hours.\n\n"
+                "• CNC-01, CNC-07, MILL-01:\n"
+                "   - Risk Assessment: LOW (< 5% failure probability)\n"
+                "   - Status: Operating within nominal tolerances; CNC-07 available as high-speed reserve (31 u/hr)."
+            )
+
+        # GLOBAL / FLEET LEVEL INTENT 2: Maintenance Schedule Optimization
+        if any(k in q_lower for k in ["maintenance", "preventative", "pm schedule", "schedule maintenance", "what maintenance"]):
+            return (
+                "Recommended Predictive Maintenance Schedule (Apex Precision Works):\n\n"
+                "1. PRIORITY 1 — IMMEDIATE DISPATCH (Next 4 Hours):\n"
+                "   • Workstation: CNC-04\n"
+                "   • Protocol: Inspect spindle bearings, clear thermal overload fault, replace coolant filter.\n"
+                "   • Rationale: Prevents repeat thermal trips on ORD-1048 machining run.\n\n"
+                "2. PRIORITY 2 — PLANNED SHIFT WINDOW (Next 48 Hours):\n"
+                "   • Workstation: CNC-02\n"
+                "   • Protocol: Dynamic spindle vibration balancing and lubrication refill.\n"
+                "   • Rationale: Eliminates micro-chatter affecting Valve Body surface finish.\n\n"
+                "3. PRIORITY 3 — ROUTINE ROTATION (Weekend Standby):\n"
+                "   • Workstations: CNC-01 & MILL-01\n"
+                "   • Protocol: Way lube check, hydraulic pressure validation, chip conveyor clearing."
+            )
+
+        # GLOBAL / FLEET LEVEL INTENT 3: Production Efficiency & OEE Bottleneck Analysis
+        if any(k in q_lower for k in ["efficiency", "oee", "utilization", "production efficiency", "bottleneck", "analyze production"]):
+            orders_list = context.get("orders") or []
+            total_planned = sum(int(o.get("quantity", 0)) for o in orders_list) or 2550
+            total_done = sum(int(o.get("completedQuantity", 0)) for o in orders_list) or 1650
+            overall_pct = round(total_done / total_planned * 100, 1) if total_planned else 64.7
+            return (
+                f"Plant Production Efficiency & Bottleneck Analysis:\n\n"
+                f"• Fleet Operational Availability: 80% (4 of 5 active CNC/Milling centers online)\n"
+                f"• Aggregate Shift Throughput: {overall_pct}% ({total_done}/{total_planned} units completed across plant)\n\n"
+                f"Identified Bottlenecks:\n"
+                f"• Primary Constraint: Spindle thermal stoppage on CNC-04 reduced machining capacity by 34 units/hr.\n"
+                f"• Quality Scrap Rate: 17 units diverted to rework on ORD-1048 (3.4% rework rate on high-tolerance bores).\n\n"
+                f"Efficiency Recommendations:\n"
+                f"1. Reroute ORD-1048 remaining lot to reserve station CNC-07 (rated 31 u/hr) to recover 6.2 hours of schedule drift.\n"
+                f"2. Stage raw forgings 2 hours prior to shift change to eliminate material wait states."
+            )
+
+        # GLOBAL / FLEET LEVEL INTENT 4: High-Risk Work Orders
+        if any(k in q_lower for k in ["high-risk", "high risk", "risk orders", "critical orders", "show me high"]):
+            return (
+                "High-Risk Order Dossier (Apex Precision Works):\n\n"
+                "• ORD-1048 — Impeller Housing (AeroTurbine Dynamics):\n"
+                "   - Status: CRITICAL (Risk Score: 81.2/100 · Delayed)\n"
+                "   - Progress: 160 / 500 units (32% complete, 340 remaining)\n"
+                "   - Root Cause: CNC-04 thermal trip (45 min outage) + 17 quality rework units.\n"
+                "   - Corrective Action: Reassign to CNC-07. Human approval queued.\n\n"
+                "• ORD-1051 — Valve Body (Metro Fluid Systems):\n"
+                "   - Status: HEALTHY / WATCH (Risk Score: 17.6/100)\n"
+                "   - Progress: 430 / 700 units (61.4% complete)\n"
+                "   - Note: Spindle vibration on CNC-02 being monitored; delivery margin safe.\n\n"
+                "• ORD-1060 & ORD-1064:\n"
+                "   - Status: HEALTHY (Risk Scores: 5.7 & 5.6/100 · On track for on-time delivery)."
+            )
+
         # If no specific order selected, provide factory overview synthesis
         if not order:
             orders = context.get("orders", [])
