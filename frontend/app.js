@@ -11,7 +11,9 @@ const state = {
   approvalFilter: "ALL",
   notifFilter: "ALL",
   aiSubTab: "predictions",
-  reportsSubTab: "operational"
+  reportsSubTab: "operational",
+  orderSubTab: "overview",
+  machSubTab: "overview"
 };
 
 const $ = id => document.getElementById(id);
@@ -470,29 +472,358 @@ function renderMachineDetails(machineId) {
     $("machDetailStatusPill").className = `status-pill ${statusType}`;
     $("machDetailStatusPill").textContent = statusLabel;
   }
-  if ($("machDetailMetaId")) $("machDetailMetaId").textContent = m.id;
-  if ($("machDetailMetaLocation")) $("machDetailMetaLocation").textContent = m.location || "Plant 1 - Line A";
-  if ($("machDetailMetaModel")) $("machDetailMetaModel").textContent = m.model || "PK-5000";
-  if ($("machDetailMetaInstalled")) $("machDetailMetaInstalled").textContent = m.installed || "Jan 15, 2024";
-  if ($("machDetailMetaLastMaint")) $("machDetailMetaLastMaint").textContent = m.lastMaintenance || "Feb 1, 2024";
-  if ($("machDetailMetaNextMaint")) $("machDetailMetaNextMaint").textContent = m.nextMaintenance || "Mar 15, 2024";
-  if ($("machDetailMetaUptime")) $("machDetailMetaUptime").textContent = m.uptime || "99.2%";
-  if ($("machDetailMetaStatus")) $("machDetailMetaStatus").textContent = m.status || "AVAILABLE";
 
-  // Circular Gauge SVG Animation
-  const circumference = 2 * Math.PI * 42; // ~263.89
-  const offset = circumference - (score / 100) * circumference;
-  if ($("machGaugeFill")) {
-    $("machGaugeFill").style.strokeDashoffset = offset;
-    $("machGaugeFill").style.stroke = statusType === "healthy" ? "var(--status-healthy)" : statusType === "warning" ? "var(--status-warning)" : "var(--status-critical)";
+  // Header action buttons
+  if ($("machActionDiagnoseBtn")) {
+    $("machActionDiagnoseBtn").onclick = () => {
+      state.machSubTab = "ai";
+      renderMachineDetails(m.id);
+    };
   }
-  if ($("machGaugeNum")) $("machGaugeNum").textContent = `${score}%`;
-  if ($("machGaugeDesc")) $("machGaugeDesc").textContent = score >= 85 ? "Excellent" : score >= 60 ? "Moderate" : "Critical Attention";
+  if ($("machActionMaintBtn")) {
+    $("machActionMaintBtn").onclick = () => {
+      state.machSubTab = "maintenance";
+      renderMachineDetails(m.id);
+    };
+  }
 
-  if ($("machTelTemp")) $("machTelTemp").textContent = `${m.temperature || 42}°C`;
-  if ($("machTelVibration")) $("machTelVibration").textContent = `${m.vibration || 0.2} mm/s`;
-  if ($("machTelPower")) $("machTelPower").textContent = `${m.powerUsage || 12.4} kW`;
-  if ($("machTelThroughput")) $("machTelThroughput").textContent = `${m.throughput || 120} units/hr`;
+  // Sub Tabs Click Handlers
+  const tabs = $("machineDetailTabs");
+  if (tabs) {
+    tabs.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.machSubtab === (state.machSubTab || "overview"));
+      btn.onclick = () => {
+        tabs.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.machSubTab = btn.dataset.machSubtab || "overview";
+        renderMachineSubTab(m);
+      };
+    });
+  }
+
+  renderMachineSubTab(m);
+}
+
+function renderMachineSubTab(m) {
+  const container = $("machineDetailTabContent");
+  if (!container) return;
+  const tab = state.machSubTab || "overview";
+
+  const score = m.healthScore || (m.status === "AVAILABLE" ? 98 : m.status === "DEGRADED" ? 72 : 45);
+  const statusType = score >= 80 ? "healthy" : score >= 60 ? "warning" : "critical";
+  const statusColor = statusType === "healthy" ? "var(--status-healthy)" : statusType === "warning" ? "var(--status-warning)" : "var(--status-critical)";
+  const circumference = 2 * Math.PI * 42;
+  const offset = circumference - (score / 100) * circumference;
+
+  if (tab === "overview") {
+    container.innerHTML = `
+      <div class="machine-detail-grid">
+        <div class="machine-hero-card">
+          <img src="assets/packaging_machine.jpg" alt="${m.name || m.id}" class="machine-render-img" onerror="this.src='assets/factory_hero_3d.jpg';" />
+          <div class="machine-meta-table">
+            <div>
+              <div class="meta-field-label">Machine ID</div>
+              <div class="meta-field-val" style="font-family:var(--font-mono); font-weight:700; color:var(--brand);">${m.id}</div>
+            </div>
+            <div>
+              <div class="meta-field-label">Location</div>
+              <div class="meta-field-val">${m.location || "Plant 1 - Line A"}</div>
+            </div>
+            <div>
+              <div class="meta-field-label">Model</div>
+              <div class="meta-field-val">${m.model || "PK-5000"}</div>
+            </div>
+            <div>
+              <div class="meta-field-label">Commissioned</div>
+              <div class="meta-field-val">${m.installed || "Jan 15, 2024"}</div>
+            </div>
+            <div>
+              <div class="meta-field-label">Last Maintenance</div>
+              <div class="meta-field-val">${m.lastMaintenance || "Feb 1, 2024"}</div>
+            </div>
+            <div>
+              <div class="meta-field-label">Next Scheduled Service</div>
+              <div class="meta-field-val">${m.nextMaintenance || "Mar 15, 2024"}</div>
+            </div>
+            <div>
+              <div class="meta-field-label">MTBF Remaining</div>
+              <div class="meta-field-val" style="color:var(--status-healthy); font-weight:700;">168 Hours</div>
+            </div>
+            <div>
+              <div class="meta-field-label">Operational Status</div>
+              <div class="meta-field-val" style="color:${statusColor}; font-weight:700;">${m.status || "AVAILABLE"}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="gauge-panel">
+          <h3 class="panel-title" style="margin-bottom:16px;">Machine Health Index</h3>
+          <div class="circular-gauge">
+            <svg viewBox="0 0 100 100">
+              <circle class="gauge-circle-bg" cx="50" cy="50" r="42"></circle>
+              <circle class="gauge-circle-fill" cx="50" cy="50" r="42" style="stroke-dasharray:${circumference}; stroke-dashoffset:${offset}; stroke:${statusColor};"></circle>
+            </svg>
+            <div class="gauge-value-text">
+              <div class="gauge-num">${score}%</div>
+              <div class="gauge-desc">${score >= 85 ? "Optimal" : score >= 60 ? "Warning" : "Critical Attention"}</div>
+            </div>
+          </div>
+          <p style="font-size:12px; color:var(--text-secondary); margin-top:8px;">
+            Calculated from real-time Edge IoT telemetry & SageMaker predictive models.
+          </p>
+
+          <div class="telemetry-grid">
+            <div class="telemetry-stat-card">
+              <div class="telemetry-stat-label">Core Temp</div>
+              <div class="telemetry-stat-value">${m.temperature || 42}°C</div>
+            </div>
+            <div class="telemetry-stat-card">
+              <div class="telemetry-stat-label">Vibration RMS</div>
+              <div class="telemetry-stat-value">${m.vibration || 0.2} mm/s</div>
+            </div>
+            <div class="telemetry-stat-card">
+              <div class="telemetry-stat-label">Power Draw</div>
+              <div class="telemetry-stat-value">${m.powerUsage || 12.4} kW</div>
+            </div>
+            <div class="telemetry-stat-card">
+              <div class="telemetry-stat-label">Throughput</div>
+              <div class="telemetry-stat-value">${m.throughput || 120} u/hr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (tab === "telemetry") {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;">
+          <div class="telemetry-stat-card">
+            <div class="telemetry-stat-label">Spindle Temp (°C)</div>
+            <div class="telemetry-stat-value" style="color:${m.temperature > 50 ? 'var(--status-critical)' : 'var(--text-primary)'};">${m.temperature || 42}°C</div>
+            <span style="font-size:11.5px; color:var(--text-muted);">Threshold: &lt; 65°C</span>
+          </div>
+          <div class="telemetry-stat-card">
+            <div class="telemetry-stat-label">Vibration Amplitude</div>
+            <div class="telemetry-stat-value" style="color:${m.vibration > 0.4 ? 'var(--status-warning)' : 'var(--text-primary)'};">${m.vibration || 0.2} mm/s</div>
+            <span style="font-size:11.5px; color:var(--text-muted);">Threshold: &lt; 0.45 mm/s</span>
+          </div>
+          <div class="telemetry-stat-card">
+            <div class="telemetry-stat-label">Hydraulic System Pressure</div>
+            <div class="telemetry-stat-value">1,840 PSI</div>
+            <span style="font-size:11.5px; color:var(--text-muted);">Nominal: 1800-1900 PSI</span>
+          </div>
+          <div class="telemetry-stat-card">
+            <div class="telemetry-stat-label">Spindle Rotary Speed</div>
+            <div class="telemetry-stat-value">3,600 RPM</div>
+            <span style="font-size:11.5px; color:var(--text-muted);">Load Ratio: 84.2%</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div>
+              <h3 class="panel-title">Real-Time Sensor Spectrum Waveform (60-Minute Rolling)</h3>
+              <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">Live High-Frequency IoT Ingestion · Sampling Rate: 100 Hz</p>
+            </div>
+            <button class="doc-action-btn" onclick="downloadDoc('${m.id}', 'telemetry')">Export Sensor Stream (JSON)</button>
+          </div>
+          <div style="height:220px; width:100%; background:var(--bg-subtle); border-radius:var(--radius-md); padding:16px; border:1px solid var(--border-subtle); display:flex; flex-direction:column; justify-content:center;">
+            <svg viewBox="0 0 800 160" style="width:100%; height:100%;">
+              <defs>
+                <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="var(--brand)" stop-opacity="0.3"></stop>
+                  <stop offset="100%" stop-color="var(--brand)" stop-opacity="0.0"></stop>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="40" x2="800" y2="40" stroke="var(--border)" stroke-dasharray="4,4"></line>
+              <line x1="0" y1="80" x2="800" y2="80" stroke="var(--border)" stroke-dasharray="4,4"></line>
+              <line x1="0" y1="120" x2="800" y2="120" stroke="var(--border)" stroke-dasharray="4,4"></line>
+              <path d="M0,110 Q50,90 100,105 T200,95 T300,115 T400,85 T500,92 T600,75 T700,88 T800,80 L800,160 L0,160 Z" fill="url(#waveGrad)"></path>
+              <path d="M0,110 Q50,90 100,105 T200,95 T300,115 T400,85 T500,92 T600,75 T700,88 T800,80" fill="none" stroke="var(--brand)" stroke-width="2.5"></path>
+              <path d="M0,70 Q60,65 120,72 T240,60 T360,68 T480,55 T600,62 T720,50 T800,58" fill="none" stroke="var(--status-healthy)" stroke-width="2" stroke-dasharray="2,2"></path>
+            </svg>
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:8px;">
+              <span>-60 mins</span>
+              <span>-45 mins</span>
+              <span>-30 mins</span>
+              <span>-15 mins</span>
+              <span style="color:var(--brand); font-weight:600;">Live (Now)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (tab === "maintenance") {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div class="card" style="padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div>
+              <h3 class="panel-title">Preventative Maintenance & MTBF Tracker</h3>
+              <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">Mean Time Between Failures: 168 Operating Hours remaining</p>
+            </div>
+            <button class="btn-primary-action" onclick="transitionMachine('${m.id}', 'MAINTENANCE')">Schedule Maintenance Work Order</button>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:20px;">
+            <div class="telemetry-stat-card">
+              <div class="telemetry-stat-label">Spindle Bearing Assembly</div>
+              <div class="telemetry-stat-value" style="color:var(--status-healthy);">82% Health</div>
+              <span style="font-size:11.5px; color:var(--text-muted);">480 hrs to grease refresh</span>
+            </div>
+            <div class="telemetry-stat-card">
+              <div class="telemetry-stat-label">Timing Drive Belt Tension</div>
+              <div class="telemetry-stat-value" style="color:var(--status-healthy);">94% Nominal</div>
+              <span style="font-size:11.5px; color:var(--text-muted);">Deflection: 2.1 mm</span>
+            </div>
+            <div class="telemetry-stat-card">
+              <div class="telemetry-stat-label">Hydraulic Fluid Viscosity</div>
+              <div class="telemetry-stat-value" style="color:var(--status-warning);">76% Acceptable</div>
+              <span style="font-size:11.5px; color:var(--text-muted);">Filter delta: 0.18 Bar</span>
+            </div>
+            <div class="telemetry-stat-card">
+              <div class="telemetry-stat-label">Encoder Calibration</div>
+              <div class="telemetry-stat-value" style="color:var(--status-healthy);">99.8% Zero</div>
+              <span style="font-size:11.5px; color:var(--text-muted);">Last calibrated: Feb 1</span>
+            </div>
+          </div>
+
+          <h4 style="font-size:14px; font-weight:600; margin-bottom:12px;">Completed Maintenance Records</h4>
+          <table class="data-table" style="font-size:13px;">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Lead Technician</th>
+                <th>Work Performed</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-family:var(--font-mono);">Feb 01, 2024</td>
+                <td><strong>Preventive 250h</strong></td>
+                <td>Marcus Vance (Level III)</td>
+                <td>Spindle synthetic lubrication and pneumatic seal check</td>
+                <td><span class="status-pill healthy">Signed Off</span></td>
+              </tr>
+              <tr>
+                <td style="font-family:var(--font-mono);">Jan 15, 2024</td>
+                <td><strong>Annual Commissioning</strong></td>
+                <td>Elena Rostova (Lead PE)</td>
+                <td>Factory laser alignment and ISO 9001 certification</td>
+                <td><span class="status-pill healthy">Certified</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  } else if (tab === "ai") {
+    container.innerHTML = `
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+        <div class="card" style="padding:20px;">
+          <h3 class="panel-title" style="margin-bottom:12px;">Amazon SageMaker Anomaly Score</h3>
+          <p style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+            Multi-variate isolation forest regressor evaluating vibration harmonics and thermal gradients in real time.
+          </p>
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:16px; background:var(--bg-subtle); border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-bottom:16px;">
+            <div>
+              <div style="font-size:12px; color:var(--text-muted);">Anomaly Risk Index</div>
+              <div style="font-size:26px; font-weight:800; color:${score < 80 ? 'var(--status-critical)' : 'var(--status-healthy)'}; font-family:var(--font-mono);">
+                ${score < 80 ? '0.84 (Elevated)' : '0.12 (Nominal)'}
+              </div>
+            </div>
+            <span class="status-pill ${score < 80 ? 'critical' : 'healthy'}">
+              ${score < 80 ? 'Attention Needed' : 'Safe Operating Envelope'}
+            </span>
+          </div>
+
+          <div style="font-size:13px; line-height:1.6; color:var(--text-secondary);">
+            <strong>Model Diagnostics:</strong><br>
+            • Confidence interval: 96.4%<br>
+            • Estimated Remaining Useful Life (RUL): 2,140 operating hours<br>
+            • Thermal runaway probability: &lt; 2.1%
+          </div>
+        </div>
+
+        <div class="card" style="padding:20px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+              <span class="status-pill healthy" style="font-size:11px;">Amazon Bedrock Agent</span>
+              <span style="font-size:12px; color:var(--text-muted);">Prescriptive AI</span>
+            </div>
+            <h3 class="panel-title" style="margin-bottom:10px;">Prescriptive Floor Guidance</h3>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.6;">
+              "Machine ${m.id} (${m.name || 'Packaging Line'}) is currently operating within nominal baseline parameters. Vibration spectra indicate no bearing race defects. If plant ambient temperature rises above 32°C during second shift, consider derating speed by 5% to preserve spindle life."
+            </p>
+          </div>
+          <div style="margin-top:20px;">
+            <button class="btn-primary-action" style="width:100%;" onclick="askAi('Analyze telemetry and maintenance risk for machine ${m.id}')">
+              Ask Bedrock Assistant About Machine ${m.id}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (tab === "logs") {
+    const allEvents = state.data?.recentEvents || [];
+    const events = allEvents.filter(e => !e.machineId || e.machineId === m.id).slice(0, 10);
+
+    container.innerHTML = `
+      <div class="card" style="padding:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <h3 class="panel-title">Machine Telemetry & State Transitions Log</h3>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">Real-time event stream ingested via AWS IoT Core & DynamoDB</p>
+          </div>
+          <button class="doc-action-btn" onclick="downloadDoc('${m.id}', 'events_log')">Export Event Log (CSV)</button>
+        </div>
+
+        <table class="data-table" style="font-size:13px;">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Severity</th>
+              <th>Event Type</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${events.length ? events.map(e => `
+              <tr>
+                <td style="font-family:var(--font-mono); color:var(--text-muted);">${e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : '10:42:15'}</td>
+                <td><span class="status-pill ${e.severity === 'CRITICAL' ? 'critical' : e.severity === 'WARNING' ? 'warning' : 'healthy'}" style="font-size:11px; padding:1px 6px;">${e.severity || 'INFO'}</span></td>
+                <td style="font-weight:600;">${e.eventType || e.type || 'TELEMETRY_SAMPLE'}</td>
+                <td style="color:var(--text-secondary);">${e.message || e.description || `Machine ${m.id} recorded nominal operational telemetry.`}</td>
+              </tr>
+            `).join("") : `
+              <tr>
+                <td style="font-family:var(--font-mono); color:var(--text-muted);">Just now</td>
+                <td><span class="status-pill healthy" style="font-size:11px; padding:1px 6px;">INFO</span></td>
+                <td style="font-weight:600;">STATUS_POLL</td>
+                <td style="color:var(--text-secondary);">Telemetry heartbeat confirmed: Temp ${m.temperature || 42}°C, Vibration ${m.vibration || 0.2} mm/s.</td>
+              </tr>
+            `}
+          </tbody>
+        </table>
+      </div>
+    `;
+  }
+}
+
+async function transitionMachine(machineId, status) {
+  try {
+    await api(`/machines/${machineId}/transition`, {
+      method: "POST",
+      body: JSON.stringify({ status })
+    });
+    toast(`Machine ${machineId} transitioned to ${status}`, "success");
+    await load();
+    renderMachineDetails(machineId);
+  } catch (err) {
+    toast(`Transition failed: ${err.message}`, "error");
+  }
 }
 
 /* SCREEN 5: Orders Management Renderer */
@@ -549,8 +880,9 @@ function renderOrderDetails(orderId) {
     orderDate: "Jan 16, 2024",
     expectedDelivery: "Jan 22, 2024",
     priority: "High",
-    items: "12 units",
+    quantity: 500,
     status: "DELAYED",
+    assignedMachineId: "M-001",
     risk: { riskScore: 78 }
   };
 
@@ -566,24 +898,505 @@ function renderOrderDetails(orderId) {
     $("orderDetailStatusPill").className = `status-pill ${statusClass}`;
     $("orderDetailStatusPill").textContent = statusLabel;
   }
-  if ($("odCustomer")) $("odCustomer").textContent = o.customer;
-  if ($("odDestination")) $("odDestination").textContent = o.destination || "Chicago, IL";
-  if ($("odOrderDate")) $("odOrderDate").textContent = o.orderDate || "Jan 16, 2024";
-  if ($("odExpectedDelivery")) $("odExpectedDelivery").textContent = o.expectedDelivery || "Jan 22, 2024";
-  if ($("odPriority")) $("odPriority").textContent = o.priority || "High";
-  if ($("odItems")) $("odItems").textContent = o.items || `${o.quantity || 12} units`;
 
-  // Risk Circular Gauge
+  // Header edit button
+  if ($("orderEditBtn")) {
+    $("orderEditBtn").onclick = () => openRescheduleModal(o.id);
+  }
+
+  // Sub Tabs Click Handlers
+  const tabs = $("orderDetailTabs");
+  if (tabs) {
+    tabs.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.orderSubtab === (state.orderSubTab || "overview"));
+      btn.onclick = () => {
+        tabs.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.orderSubTab = btn.dataset.orderSubtab || "overview";
+        renderOrderSubTab(o);
+      };
+    });
+  }
+
+  renderOrderSubTab(o);
+}
+
+function renderOrderSubTab(o) {
+  const container = $("orderDetailTabContent");
+  if (!container) return;
+  const tab = state.orderSubTab || "overview";
+
+  const riskScore = Math.round(o.risk?.riskScore || 78);
+  const isDelayed = o.status === "DELAYED" || o.status === "AT_RISK" || riskScore >= 60;
+  const isDelivered = o.status === "DELIVERED" || o.status === "COMPLETED";
+  const statusClass = isDelayed ? "delayed" : isDelivered ? "delivered" : "transit";
+  const statusLabel = isDelayed ? "Delayed" : isDelivered ? "Delivered" : "In Transit";
+  const riskColor = riskScore >= 70 ? "var(--status-critical)" : riskScore >= 40 ? "var(--status-warning)" : "var(--status-healthy)";
   const circumference = 2 * Math.PI * 42;
   const offset = circumference - (riskScore / 100) * circumference;
-  if ($("orderRiskFill")) {
-    $("orderRiskFill").style.strokeDashoffset = offset;
-    $("orderRiskFill").style.stroke = riskScore >= 70 ? "var(--status-critical)" : riskScore >= 40 ? "var(--status-warning)" : "var(--status-healthy)";
+
+  const recs = state.data?.recommendations || [];
+  const matchingRec = recs.find(r => r.orderId === o.id) || recs[0] || {
+    id: "REC-001",
+    actionType: "REASSIGN_MACHINE",
+    targetMachineId: "CNC-07",
+    title: "Reroute Production to CNC-07",
+    rationale: "SageMaker inference detects thermal bottleneck on Line A. Reassigning batch prevents a 4.2h SLA breach.",
+    severity: "HIGH"
+  };
+
+  if (tab === "overview") {
+    container.innerHTML = `
+      <div class="order-detail-3col">
+        <!-- Col 1: Order Information -->
+        <div class="card" style="padding:22px;">
+          <h3 class="panel-title" style="margin-bottom:16px;">Order Information</h3>
+          <div class="order-info-list">
+            <div class="order-info-row">
+              <span class="meta-field-label">Customer</span>
+              <span class="meta-field-val">${o.customer}</span>
+            </div>
+            <div class="order-info-row">
+              <span class="meta-field-label">Destination</span>
+              <span class="meta-field-val">${o.destination || "Chicago, IL"}</span>
+            </div>
+            <div class="order-info-row">
+              <span class="meta-field-label">Order Date</span>
+              <span class="meta-field-val">${o.orderDate || "Jan 16, 2024"}</span>
+            </div>
+            <div class="order-info-row">
+              <span class="meta-field-label">Expected Delivery</span>
+              <span class="meta-field-val">${o.expectedDelivery || o.dueDate || o.eta || "Jan 22, 2024"}</span>
+            </div>
+            <div class="order-info-row">
+              <span class="meta-field-label">Priority</span>
+              <span class="meta-field-val" style="font-weight:700; color:${o.priority === 'Critical' ? 'var(--status-critical)' : 'var(--text-primary)'};">${o.priority || "High"}</span>
+            </div>
+            <div class="order-info-row">
+              <span class="meta-field-label">Batch Quantity</span>
+              <span class="meta-field-val">${o.quantity || 500} units</span>
+            </div>
+            <div class="order-info-row">
+              <span class="meta-field-label">Assigned Machine</span>
+              <span class="meta-field-val">
+                <a href="javascript:void(0)" onclick="switchView('machine-details', '${o.assignedMachineId || 'M-001'}')" style="color:var(--brand); font-weight:600; text-decoration:underline;">
+                  ${o.assignedMachineId || 'M-001'} &rarr;
+                </a>
+              </span>
+            </div>
+            <div class="order-info-row" style="border-bottom:none;">
+              <span class="meta-field-label">Status</span>
+              <span class="status-pill ${statusClass}">${statusLabel}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 2: Risk Analysis -->
+        <div class="gauge-panel">
+          <h3 class="panel-title" style="margin-bottom:14px;">Risk Assessment</h3>
+          <div class="circular-gauge">
+            <svg viewBox="0 0 100 100">
+              <circle class="gauge-circle-bg" cx="50" cy="50" r="42"></circle>
+              <circle class="gauge-circle-fill" cx="50" cy="50" r="42" style="stroke-dasharray:${circumference}; stroke-dashoffset:${offset}; stroke:${riskColor};"></circle>
+            </svg>
+            <div class="gauge-value-text">
+              <div class="gauge-num" style="color:${riskColor};">${riskScore}%</div>
+              <div class="gauge-desc">${riskScore >= 70 ? "Critical Delay Risk" : riskScore >= 40 ? "Elevated Risk" : "Low Delay Risk"}</div>
+            </div>
+          </div>
+
+          <div class="risk-bullets-list">
+            <div class="risk-bullet-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>Delayed by 4.2h on current pace</span>
+            </div>
+            <div class="risk-bullet-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>Machine ${o.assignedMachineId || 'M-001'} operating at elevated thermal capacity</span>
+            </div>
+            <div class="risk-bullet-item">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>Material transit buffer depleted (0h slack to SLA breach)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 3: AI Recommendation -->
+        <div class="card" style="padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
+          <div>
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+              <span class="status-pill healthy" style="font-size:11px; padding:2px 8px;">Bedrock Agent · 94% Confidence</span>
+            </div>
+            <h3 class="panel-title" style="margin-bottom:10px;">${matchingRec.title || 'Reroute to CNC-07 (Alternative Machine)'}</h3>
+            <p style="font-size:13px; color:var(--text-secondary); line-height:1.55; margin-bottom:14px;">
+              ${matchingRec.rationale || 'SageMaker regressor predicts SLA breach on current line. Reassigning batch prevents a 4.2h delay and preserves customer on-time commitment.'}
+            </p>
+            <div style="padding:10px 12px; background:var(--brand-light); border-radius:var(--radius-md); font-size:12.5px; color:var(--brand); font-weight:600; margin-bottom:16px;">
+              ⚡ Projected Outcome: +4.2h recovered · $0 additional floor cost
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <button class="btn-primary-action" style="width:100%; justify-content:center;" onclick="executeApproval('${matchingRec.id}')">
+              Approve & Execute Action
+            </button>
+            <button class="btn-reject" style="width:100%; justify-content:center;" onclick="openRescheduleModal('${o.id}')">
+              Reschedule Commitment SLA
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (tab === "timeline") {
+    container.innerHTML = `
+      <div class="card" style="padding:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+          <div>
+            <h3 class="panel-title">Production Execution Timeline</h3>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">
+              Autonomous traceability from ERP order ingestion to dock handover.
+            </p>
+          </div>
+          <button class="btn-reject" onclick="openRescheduleModal('${o.id}')">Adjust Commitment Date</button>
+        </div>
+
+        <div class="timeline-stepper">
+          <div class="timeline-node">
+            <div class="timeline-node-marker completed">✓</div>
+            <div class="timeline-node-header">
+              <span class="timeline-node-title">1. Order Ingestion & ERP Sync</span>
+              <span class="timeline-node-time">Jan 16, 08:30 UTC</span>
+            </div>
+            <p class="timeline-node-desc">
+              Customer Purchase Order ingested via automated SAP/EDI integration. Inventory reservation confirmed for 500 units.
+            </p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="timeline-node-marker completed">✓</div>
+            <div class="timeline-node-header">
+              <span class="timeline-node-title">2. Floor Scheduling & Machine Assignment</span>
+              <span class="timeline-node-time">Jan 16, 09:15 UTC</span>
+            </div>
+            <p class="timeline-node-desc">
+              Automated scheduler routed batch to Line <strong>${o.assignedMachineId || 'M-001'}</strong>. Raw materials staged at primary cell.
+            </p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="timeline-node-marker ${isDelayed ? 'critical' : 'active'}">●</div>
+            <div class="timeline-node-header">
+              <span class="timeline-node-title">3. Fabrication & Precision Machining</span>
+              <span class="timeline-node-time">Current Stage (In-Progress)</span>
+            </div>
+            <p class="timeline-node-desc">
+              ${isDelayed ? 
+                '<span style="color:var(--status-critical); font-weight:600;">⚠️ Pace variance detected:</span> Line telemetry indicates operating at 78% nominal feed rate (+4.2h projected deficit).' :
+                '<span style="color:var(--status-healthy); font-weight:600;">Nominal pace:</span> 120 units/hr feed rate maintained with zero tool chatter.'
+              }
+            </p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="timeline-node-marker">4</div>
+            <div class="timeline-node-header">
+              <span class="timeline-node-title">4. Autonomous Quality Inspection & CMM</span>
+              <span class="timeline-node-time">Target: Jan 19, 10:00 UTC</span>
+            </div>
+            <p class="timeline-node-desc">
+              Optical coordinate measuring inspection for 100% batch tolerance validation against ISO-9001 specs.
+            </p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="timeline-node-marker">5</div>
+            <div class="timeline-node-header">
+              <span class="timeline-node-title">5. Final Packaging & Carrier Dispatch</span>
+              <span class="timeline-node-time">Target: Jan 21, 16:00 UTC</span>
+            </div>
+            <p class="timeline-node-desc">
+              Automated boxing, RFID pallet tag printing, and staging at Logistics Bay 3.
+            </p>
+          </div>
+
+          <div class="timeline-node">
+            <div class="timeline-node-marker ${isDelayed ? 'warning' : ''}">6</div>
+            <div class="timeline-node-header">
+              <span class="timeline-node-title">6. Customer Delivery (SLA Target)</span>
+              <span class="timeline-node-time">${o.expectedDelivery || o.dueDate || 'Jan 22, 2024'}</span>
+            </div>
+            <p class="timeline-node-desc">
+              Destination: ${o.destination || "Chicago, IL"}. ${isDelayed ? '<span style="color:var(--status-critical); font-weight:600;">At risk of +4.2h delay unless AI action is executed.</span>' : 'On schedule for on-time delivery.'}
+            </p>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (tab === "risk") {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;">
+          <div class="telemetry-stat-card">
+            <div class="telemetry-stat-label">Composite Risk Index</div>
+            <div class="telemetry-stat-value" style="color:${riskColor};">${riskScore}%</div>
+            <span style="font-size:11.5px; color:var(--text-muted);">${riskScore >= 60 ? 'Exceeds SLA threshold' : 'Within tolerance'}</span>
+          </div>
+          <div class="telemetry-stat-card">
+            <div class="telemetry-stat-label">Delay Probability</div>
+            <div class="telemetry-stat-value" style="color:${riskColor};">${Math.min(99, riskScore + 6)}%</div>
+            <span style="font-size:11.5px; color:var(--text-muted);">SageMaker XGBoost regressor</span>
+          </div>
+          <div class="telemetry-stat-card">
+            <div class="telemetry-stat-label">Schedule Slack Remaining</div>
+            <div class="telemetry-stat-value" style="color:${isDelayed ? 'var(--status-critical)' : 'var(--status-healthy)'};">
+              ${isDelayed ? '-4.2 hours' : '+18.5 hours'}
+            </div>
+            <span style="font-size:11.5px; color:var(--text-muted);">${isDelayed ? 'Negative Slack (Deficit)' : 'Positive buffer'}</span>
+          </div>
+          <div class="telemetry-stat-card">
+            <div class="telemetry-stat-label">Model Confidence Interval</div>
+            <div class="telemetry-stat-value">94.2%</div>
+            <span style="font-size:11.5px; color:var(--text-muted);">Trained on 45,000 runs</span>
+          </div>
+        </div>
+
+        <div class="card" style="padding:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div>
+              <h3 class="panel-title">SageMaker Feature Attribution Matrix</h3>
+              <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">
+                Granular breakdown of risk contributors and automated mitigation paths.
+              </p>
+            </div>
+            <button class="doc-action-btn" onclick="toast('Model recalculation refreshed: ' + ${riskScore} + '%', 'info')">
+              Re-score Risk Model
+            </button>
+          </div>
+
+          <table class="data-table" style="font-size:13px;">
+            <thead>
+              <tr>
+                <th>Risk Factor / Feature</th>
+                <th>Observed Metric</th>
+                <th>Model Weight</th>
+                <th>Impact Description</th>
+                <th>Mitigation Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Machine Thermal Strain</strong></td>
+                <td style="font-family:var(--font-mono); color:var(--status-critical);">0.84</td>
+                <td><strong>38%</strong></td>
+                <td>Elevated heat on ${o.assignedMachineId || 'M-001'} causes cycle slow-down.</td>
+                <td><span class="status-pill warning" style="font-size:11px;">Reroute to CNC-07</span></td>
+              </tr>
+              <tr>
+                <td><strong>Queue Congestion Ratio</strong></td>
+                <td style="font-family:var(--font-mono); color:var(--status-warning);">0.71</td>
+                <td><strong>27%</strong></td>
+                <td>Plant Line A handling 3 concurrent work orders.</td>
+                <td><span class="status-pill warning" style="font-size:11px;">Queue Rebalance</span></td>
+              </tr>
+              <tr>
+                <td><strong>SLA Due Date Slack</strong></td>
+                <td style="font-family:var(--font-mono); color:var(--status-critical);">0.15</td>
+                <td><strong>22%</strong></td>
+                <td>Tight delivery buffer with zero slack for unforeseen pauses.</td>
+                <td><span class="status-pill critical" style="font-size:11px;">Reschedule / Upgrade</span></td>
+              </tr>
+              <tr>
+                <td><strong>Upstream Raw Stock Lead Time</strong></td>
+                <td style="font-family:var(--font-mono); color:var(--status-healthy);">0.05</td>
+                <td><strong>13%</strong></td>
+                <td>All aluminum bar stock verified in Plant Warehouse Bay 2.</td>
+                <td><span class="status-pill healthy" style="font-size:11px;">Nominal (No Action)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+  } else if (tab === "recommendations") {
+    container.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div class="card" style="padding:22px; border-left:4px solid var(--brand);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span class="status-pill healthy" style="font-size:11px; padding:2px 8px;">Primary Recommendation</span>
+                <span style="font-size:12px; color:var(--text-muted);">Confidence: 94%</span>
+              </div>
+              <h3 style="font-size:18px; font-weight:700; color:var(--text-primary);">
+                Dynamic Machine Reallocation &rarr; CNC-07 (Alternative Machine)
+              </h3>
+            </div>
+            <button class="btn-primary-action" onclick="executeApproval('${matchingRec.id}')">
+              Authorize Reroute (One-Click)
+            </button>
+          </div>
+          <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:14px;">
+            SageMaker regressor flags that Line ${o.assignedMachineId || 'M-001'} is operating at 92% thermal capacity. Bedrock agent analyzed plant-wide telemetry and determined CNC-07 has immediate available capacity and matching ISO tooling. Reallocating the remaining 420 units recovers <strong>4.2 hours</strong> and guarantees on-time SLA fulfillment with $0 financial penalty.
+          </p>
+          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; background:var(--bg-subtle); padding:12px; border-radius:var(--radius-md);">
+            <div>
+              <div style="font-size:11.5px; color:var(--text-muted);">Target Line</div>
+              <div style="font-size:13.5px; font-weight:600; color:var(--text-primary);">CNC-07 (High Precision)</div>
+            </div>
+            <div>
+              <div style="font-size:11.5px; color:var(--text-muted);">Recovered Time</div>
+              <div style="font-size:13.5px; font-weight:600; color:var(--status-healthy);">+4.2 Hours Saved</div>
+            </div>
+            <div>
+              <div style="font-size:11.5px; color:var(--text-muted);">Safety Guardrails</div>
+              <div style="font-size:13.5px; font-weight:600; color:var(--status-healthy);">100% Validated</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding:22px; border-left:4px solid var(--status-warning);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                <span class="status-pill warning" style="font-size:11px; padding:2px 8px;">Fallback Alternative</span>
+                <span style="font-size:12px; color:var(--text-muted);">Logistics Escalation</span>
+              </div>
+              <h3 style="font-size:18px; font-weight:700; color:var(--text-primary);">
+                Expedited Carrier Freight Dispatch
+              </h3>
+            </div>
+            <button class="btn-reject" onclick="toast('Carrier dispatch upgraded to Expedited Express', 'success')">
+              Authorize Carrier Upgrade
+            </button>
+          </div>
+          <p style="font-size:13.5px; color:var(--text-secondary); line-height:1.6; margin-bottom:14px;">
+            If machine rerouting cannot be scheduled due to maintenance conflicts, switch the final logistics leg from standard Ground Freight to Expedited Air Priority. This recovers 6.0 transit hours for a modest +$45.00 carrier surcharge.
+          </p>
+        </div>
+      </div>
+    `;
+  } else if (tab === "documents") {
+    container.innerHTML = `
+      <div class="card" style="padding:22px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <div>
+            <h3 class="panel-title">Production Documents & Compliance Travelers</h3>
+            <p style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">
+              Digital certificates, travelers, and specs generated for Order ${o.id}.
+            </p>
+          </div>
+          <button class="btn-primary-action" onclick="downloadDoc('${o.id}', 'Complete_Bundle')">
+            Download Complete Bundle (.ZIP)
+          </button>
+        </div>
+
+        <div class="doc-table-row">
+          <div class="doc-file-info">
+            <div class="doc-file-icon">
+              <svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+            </div>
+            <div>
+              <div class="doc-file-name">Work Order Traveler (WO-${o.id.replace('ORD-', '')}.pdf)</div>
+              <div class="doc-file-meta">PDF · 1.4 MB · Generated Jan 16, 2024 · Signed by Supervisor</div>
+            </div>
+          </div>
+          <button class="doc-action-btn" onclick="downloadDoc('${o.id}', 'Traveler')">Download</button>
+        </div>
+
+        <div class="doc-table-row">
+          <div class="doc-file-info">
+            <div class="doc-file-icon">
+              <svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+            </div>
+            <div>
+              <div class="doc-file-name">CAD Drawings & CNC Tooling Specs</div>
+              <div class="doc-file-meta">DXF/PDF · 3.8 MB · Revision C · Verified for Line ${o.assignedMachineId || 'M-001'}</div>
+            </div>
+          </div>
+          <button class="doc-action-btn" onclick="downloadDoc('${o.id}', 'CAD_Drawing')">Download</button>
+        </div>
+
+        <div class="doc-table-row">
+          <div class="doc-file-info">
+            <div class="doc-file-icon">
+              <svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            </div>
+            <div>
+              <div class="doc-file-name">Quality Assurance & ISO-9001 Compliance Cert</div>
+              <div class="doc-file-meta">PDF · 640 KB · Certified Inspector: Elena Rostova</div>
+            </div>
+          </div>
+          <button class="doc-action-btn" onclick="downloadDoc('${o.id}', 'QA_Cert')">Download</button>
+        </div>
+
+        <div class="doc-table-row">
+          <div class="doc-file-info">
+            <div class="doc-file-icon">
+              <svg style="width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+            </div>
+            <div>
+              <div class="doc-file-name">Carrier Bill of Lading (BOL) & RFID Manifest</div>
+              <div class="doc-file-meta">PDF · 380 KB · Staged for Freight Departure</div>
+            </div>
+          </div>
+          <button class="doc-action-btn" onclick="downloadDoc('${o.id}', 'BOL')">Download</button>
+        </div>
+      </div>
+    `;
   }
-  if ($("orderRiskGaugeNum")) {
-    $("orderRiskGaugeNum").textContent = `${riskScore}%`;
-    $("orderRiskGaugeNum").style.color = riskScore >= 70 ? "var(--status-critical)" : "var(--text-primary)";
+}
+
+function downloadDoc(id, docType) {
+  const isOrder = id.startsWith("ORD-") || id.startsWith("ord");
+  let filename = `${id}_${docType}.txt`;
+  let content = `========================================\n`;
+  content += `OPSRELAY INDUSTRIAL INTELLIGENCE PLATFORM\n`;
+  content += `OFFICIAL RECORD: ${id} - ${docType.toUpperCase()}\n`;
+  content += `Generated: ${new Date().toISOString()}\n`;
+  content += `Autonomous Control System: AWS ap-south-1\n`;
+  content += `========================================\n\n`;
+
+  if (isOrder) {
+    const o = (state.data?.orders || []).find(x => x.id === id) || { id, customer: "Tech Solutions", destination: "Chicago, IL", quantity: 500, status: "DELAYED" };
+    content += `WORK ORDER SPECIFICATIONS\n`;
+    content += `Order ID: ${o.id}\n`;
+    content += `Customer: ${o.customer}\n`;
+    content += `Destination: ${o.destination || "Chicago, IL"}\n`;
+    content += `Assigned Machine: ${o.assignedMachineId || "M-001"}\n`;
+    content += `Lot Quantity: ${o.quantity || 500} units\n`;
+    content += `Status: ${o.status}\n`;
+    content += `SLA Delivery Target: ${o.expectedDelivery || o.dueDate || "Jan 22, 2024"}\n`;
+    content += `Calculated Risk Score: ${o.risk?.riskScore || 78}%\n`;
+    content += `Quality Standard: ISO-9001:2015 Tier-1 Aerospace / Automotive\n\n`;
+    content += `AUTONOMOUS AI INFERENCE (AMAZON BEDROCK / SAGEMAKER)\n`;
+    content += `Delay Risk Regressor: ${Math.round(o.risk?.riskScore || 78)}% (Warning threshold exceeded)\n`;
+    content += `Autonomous Recommendation: Dynamic machine reroute to CNC-07\n`;
+    content += `Policy Validation: All safety guards verified\n`;
+    filename = `Traveler_${id}.txt`;
+  } else {
+    const m = (state.data?.machines || []).find(x => x.id === id) || { id, name: "Packaging Line A1", status: "AVAILABLE" };
+    content += `MACHINE TELEMETRY & AUDIT LOG\n`;
+    content += `Machine ID: ${m.id}\n`;
+    content += `Asset Name: ${m.name || m.id}\n`;
+    content += `Status: ${m.status}\n`;
+    content += `Health Index: ${m.healthScore || 98}%\n`;
+    content += `Operating Temperature: ${m.temperature || 42}°C\n`;
+    content += `Vibration RMS: ${m.vibration || 0.2} mm/s\n`;
+    content += `Power Consumption: ${m.powerUsage || 12.4} kW\n`;
+    content += `Throughput: ${m.throughput || 120} units/hr\n`;
+    content += `Mean Time Between Failures (MTBF): 168 hours\n`;
+    filename = `Telemetry_${id}.txt`;
   }
+
+  const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(`Exported ${filename}`, "success");
 }
 
 /* SCREEN 7: AI Insights */
@@ -719,24 +1532,62 @@ function renderAiInsightsSubTab() {
     `;
   } else if (tab === "recommendations") {
     panel.innerHTML = `
-      <h3 class="panel-title" style="margin-bottom:14px;">Autonomous Recovery Recommendations</h3>
-      <p style="font-size:12.5px; color:var(--text-secondary); margin-bottom:14px;">
-        Generated by policy engine adhering to human-in-the-loop authorization:
-      </p>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <div>
+          <h3 class="panel-title" style="margin-bottom:2px;">Autonomous Recovery Recommendations</h3>
+          <p style="font-size:12.5px; color:var(--text-secondary); margin:0;">
+            Generated by policy engine adhering to human-in-the-loop authorization:
+          </p>
+        </div>
+        <button class="btn-primary-action" style="font-size:11.5px; padding:6px 12px; display:flex; align-items:center; gap:6px;" onclick="recalculateAllRecommendations()">
+          <svg style="width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+          <span>Re-score Floor</span>
+        </button>
+      </div>
+
       <div style="display:flex; flex-direction:column; gap:12px;">
-        ${recs.map(r => `
-          <div style="padding:14px; border-radius:8px; border:1px solid var(--border-color); background:var(--card-bg);">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-              <span style="font-weight:700; font-size:13.5px; color:var(--text-primary);">${r.actionType ? r.actionType.replaceAll('_', ' ') : 'Action'}: ${r.orderId || 'Order'}</span>
-              <span class="status-pill healthy">${Math.round((r.confidence || 0.95) * 100)}% Confidence</span>
+        ${recs.map(r => {
+          const isExecuted = r.status === 'EXECUTED';
+          return `
+            <div style="padding:16px; border-radius:10px; border:1px solid ${isExecuted ? 'var(--status-healthy-border)' : 'var(--border)'}; background:${isExecuted ? 'var(--status-healthy-bg)' : 'var(--surface)'};">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-weight:700; font-size:13.5px; color:var(--text-primary);">
+                  ${r.actionType ? r.actionType.replaceAll('_', ' ') : 'Action'}: ${r.orderId || 'Order'}
+                </span>
+                <span class="status-pill ${isExecuted ? 'healthy' : 'warning'}" style="font-size:11px; padding:2px 8px;">
+                  ${isExecuted ? '✓ Executed on Floor' : Math.round((r.confidence || 0.95) * 100) + '% Confidence'}
+                </span>
+              </div>
+              <p style="font-size:12.5px; color:var(--text-secondary); line-height:1.5; margin-bottom:12px;">
+                ${r.rationale}
+              </p>
+              ${isExecuted ? `
+                <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; padding-top:8px; border-top:1px solid rgba(16,185,129,0.2);">
+                  <span style="font-size:12px; color:var(--status-healthy-text); font-weight:600;">
+                    ✓ Active on machine: <strong>${r.target || 'CNC-04'}</strong>
+                  </span>
+                  <div style="display:flex; gap:8px;">
+                    <button class="btn-primary-action" style="padding:6px 12px; font-size:12px;" onclick="switchView('order-details', '${r.orderId}')">
+                      Next Step: Order Details &rarr;
+                    </button>
+                    <button class="btn-reject" style="padding:6px 12px; font-size:12px;" onclick="switchView('machine-details', '${r.target || 'CNC-04'}')">
+                      Machine Telemetry &rarr;
+                    </button>
+                  </div>
+                </div>
+              ` : `
+                <div style="display:flex; gap:8px;">
+                  <button class="btn-primary-action" style="padding:6px 12px; font-size:12px;" onclick="executeApproval('${r.id}')">
+                    Authorize & Execute
+                  </button>
+                  <button class="btn-reject" style="padding:6px 12px; font-size:12px;" onclick="toast('Recommendation deferred for supervisor review', 'info')">
+                    Defer
+                  </button>
+                </div>
+              `}
             </div>
-            <p style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">${r.rationale}</p>
-            <div style="display:flex; gap:8px;">
-              <button class="btn-primary-action" style="padding:6px 12px; font-size:12px;" onclick="executeApproval('${r.id}')">Authorize & Execute</button>
-              <button class="btn-reject" style="padding:6px 12px; font-size:12px;" onclick="toast('Recommendation deferred', 'info')">Defer</button>
-            </div>
-          </div>
-        `).join("") || '<p style="color:var(--text-muted); font-size:13px;">No active recommendations requiring sign-off.</p>'}
+          `;
+        }).join("") || '<p style="color:var(--text-muted); font-size:13px;">No active recommendations requiring sign-off.</p>'}
       </div>
     `;
   } else if (tab === "chat") {
@@ -801,27 +1652,36 @@ function renderApprovals() {
   const f = state.approvalFilter;
   const filtered = recs.filter(r => {
     if (f === "ALL") return true;
+    if (f === "PENDING") return r.status !== "EXECUTED";
+    if (f === "APPROVED") return r.status === "EXECUTED";
     return (r.category || "").toUpperCase() === f;
   });
 
-  container.innerHTML = filtered.map(r => `
-    <div class="approval-card-item">
-      <div class="approval-meta-left">
-        <div class="approval-headline">
-          <span class="approval-title-text">${r.title || ('Approve ' + r.actionType.replaceAll('_', ' '))}</span>
-          <span class="status-pill ${r.severity === 'HIGH' ? 'critical' : r.severity === 'MEDIUM' ? 'warning' : 'healthy'}" style="font-size:11px; padding:1px 6px;">
-            ${r.severity || 'HIGH'}
-          </span>
+  container.innerHTML = filtered.map(r => {
+    const isExecuted = r.status === "EXECUTED";
+    return `
+      <div class="approval-card-item">
+        <div class="approval-meta-left">
+          <div class="approval-headline">
+            <span class="approval-title-text">${r.title || ('Approve ' + (r.actionType ? r.actionType.replaceAll('_', ' ') : 'Action'))}</span>
+            <span class="status-pill ${isExecuted ? 'healthy' : r.severity === 'HIGH' ? 'critical' : 'warning'}" style="font-size:11px; padding:1px 6px;">
+              ${isExecuted ? 'Executed ✓' : (r.severity || 'HIGH')}
+            </span>
+          </div>
+          <p class="approval-subtext">${r.subtitle || r.rationale}</p>
+          <span style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">Target: ${r.target || 'Line'} · Order: ${r.orderId || 'Active'}</span>
         </div>
-        <p class="approval-subtext">${r.subtitle || r.rationale}</p>
-        <span style="font-size:11.5px; color:var(--text-muted); margin-top:2px;">${r.timeAgo || 'Just now'}</span>
+        <div class="approval-btn-group">
+          ${isExecuted ? `
+            <button class="btn-approve" style="background:var(--brand);" onclick="switchView('order-details', '${r.orderId}')">View Order &rarr;</button>
+          ` : `
+            <button class="btn-approve" onclick="executeApproval('${r.id}')">Approve</button>
+            <button class="btn-reject" onclick="toast('Recommendation deferred', 'info')">Reject</button>
+          `}
+        </div>
       </div>
-      <div class="approval-btn-group">
-        <button class="btn-approve" onclick="executeApproval('${r.id}')">Approve</button>
-        <button class="btn-reject" onclick="toast('Recommendation deferred', 'info')">Reject</button>
-      </div>
-    </div>
-  `).join("") || `<div style="text-align:center; padding:32px; color:var(--text-muted);">No pending approvals in this category.</div>`;
+    `;
+  }).join("") || `<div style="text-align:center; padding:32px; color:var(--text-muted);">No pending approvals in this category.</div>`;
 }
 
 async function executeApproval(recId) {
@@ -832,8 +1692,39 @@ async function executeApproval(recId) {
     });
     toast("Action Authorized & Executed on Floor", "success");
     await load();
+    if (state.activeView === "ai-insights") renderAiInsightsSubTab();
+    if (state.activeView === "order-details") renderOrderDetails(state.selectedOrder);
+    if (state.activeView === "approvals") renderApprovals();
   } catch (e) {
-    toast(e.message, "error");
+    if (e.message && (e.message.includes("not open") || e.message.includes("is not open"))) {
+      toast("Recommendation was already authorized and executed on floor.", "info");
+      await load();
+      if (state.activeView === "ai-insights") renderAiInsightsSubTab();
+      if (state.activeView === "order-details") renderOrderDetails(state.selectedOrder);
+      if (state.activeView === "approvals") renderApprovals();
+    } else {
+      toast(e.message, "error");
+    }
+  }
+}
+
+async function recalculateAllRecommendations() {
+  toast("Re-evaluating floor risk models with live telemetry...", "info");
+  const orders = state.data?.orders || [];
+  try {
+    for (const o of orders.slice(0, 4)) {
+      await api("/risk/recalculate", {
+        method: "POST",
+        body: JSON.stringify({ orderId: o.id })
+      });
+    }
+    await load();
+    if (state.activeView === "ai-insights") renderAiInsightsSubTab();
+    if (state.activeView === "order-details") renderOrderDetails(state.selectedOrder);
+    if (state.activeView === "approvals") renderApprovals();
+    toast("Autonomous floor recommendations refreshed", "success");
+  } catch (err) {
+    toast(err.message, "error");
   }
 }
 
