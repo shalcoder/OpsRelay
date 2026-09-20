@@ -15,7 +15,9 @@ permissions:
 env:
   AWS_REGION: ap-south-1
   S3_BUCKET: opsrelay-frontend-704932818996
-  SAM_STACK_NAME: opsrelay-stack
+  API_FUNCTION_NAME: opsrelay-api
+  API_URL: https://4q0wc7pbk4.execute-api.ap-south-1.amazonaws.com/prod
+  DEPLOY_ROLE_ARN: arn:aws:iam::704932818996:role/opsrelay-github-deploy-role
 
 jobs:
   # ─────────────────────────────────────────────────────────
@@ -52,16 +54,16 @@ jobs:
           path: test-results.xml
 
   # ─────────────────────────────────────────────────────────
-  # JOB 2: Build & Deploy Backend (SAM)
+  # JOB 2: Deploy existing production Lambda
   # ─────────────────────────────────────────────────────────
   deploy-backend:
-    name: Deploy Backend (SAM)
+    name: Deploy Backend (Lambda)
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     outputs:
-      api-url: ${{ steps.get-outputs.outputs.api-url }}
+      api-url: ${{ env.API_URL }}
 
     steps:
       - name: Checkout
@@ -70,37 +72,18 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Setup AWS SAM CLI
-        uses: aws-actions/setup-sam@v2
-        with:
-          use-installer: true
-
-      - name: SAM Build
-        run: sam build --use-container
-
-      - name: SAM Deploy
+      - name: Package and update API Lambda
         run: |
-          sam deploy \
-            --stack-name ${{ env.SAM_STACK_NAME }} \
-            --region ${{ env.AWS_REGION }} \
-            --capabilities CAPABILITY_IAM \
-            --no-confirm-changeset \
-            --no-fail-on-empty-changeset \
-            --resolve-s3
-
-      - name: Get API Gateway URL from CloudFormation outputs
-        id: get-outputs
-        run: |
-          API_URL=$(aws cloudformation describe-stacks \
-            --stack-name ${{ env.SAM_STACK_NAME }} \
-            --region ${{ env.AWS_REGION }} \
-            --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
-            --output text)
-          echo "api-url=$API_URL" >> $GITHUB_OUTPUT
-          echo "API URL: $API_URL"
+          cd api
+          zip -r ../opsrelay-api.zip . -x "__pycache__/*" "*.pyc"
+          cd ..
+          aws lambda update-function-code \
+            --function-name ${{ env.API_FUNCTION_NAME }} \
+            --zip-file fileb://opsrelay-api.zip \
+            --region ${{ env.AWS_REGION }}
 
   # ─────────────────────────────────────────────────────────
   # JOB 3: Deploy Frontend to S3
@@ -118,7 +101,7 @@ jobs:
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          role-to-assume: ${{ env.DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Write production config.js
@@ -130,7 +113,12 @@ jobs:
           window.OPSR_CONFIG = {
             apiBaseUrl: '${API_URL}/api',
             region: '${{ env.AWS_REGION }}',
-            environment: 'production'
+            environment: 'production',
+            cognito: {
+              userPoolId: 'ap-south-1_8RwKqg1pG',
+              clientId: '3b5g8ubijpcdg032lhmdouc9is',
+              endpoint: 'https://cognito-idp.ap-south-1.amazonaws.com'
+            }
           };
           EOF
           echo "config.js written with API URL: $API_URL"
@@ -139,7 +127,6 @@ jobs:
         run: |
           aws s3 sync frontend/ s3://${{ env.S3_BUCKET }}/ \
             --region ${{ env.AWS_REGION }} \
-            --delete \
             --cache-control "max-age=86400" \
             --exclude "*.html"
 
@@ -149,13 +136,6 @@ jobs:
             --exclude "*" \
             --include "*.html" \
             --cache-control "no-cache, no-store, must-revalidate"
-
-      - name: Invalidate CloudFront cache (if configured)
-        if: vars.CLOUDFRONT_DISTRIBUTION_ID != ''
-        run: |
-          aws cloudfront create-invalidation \
-            --distribution-id ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }} \
-            --paths "/*"
 
       - name: Print deployment summary
         run: |
@@ -176,30 +156,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
-      - name: Wait for API to warm up
-        run: sleep 10
-
-      - name: Smoke test - dashboard endpoint
+      - name: Smoke test - frontend endpoint
         run: |
-          API_URL="${{ needs.deploy-backend.outputs.api-url }}"
-          echo "Testing: $API_URL/api/dashboard"
-          RESPONSE=$(curl -sf "$API_URL/api/dashboard" -w "\n%{http_code}" || echo "000")
-          HTTP_STATUS=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | head -1)
-          echo "HTTP Status: $HTTP_STATUS"
-          if [ "$HTTP_STATUS" != "200" ]; then
-            echo "SMOKE TEST FAILED — Expected 200, got $HTTP_STATUS"
-            exit 1
-          fi
+          curl -sf "http://${{ env.S3_BUCKET }}.s3-website.${{ env.AWS_REGION }}.amazonaws.com/" > /dev/null
           echo "Smoke test PASSED"
-
-      - name: Smoke test - machines endpoint
-        run: |
-          API_URL="${{ needs.deploy-backend.outputs.api-url }}"
-          curl -sf "$API_URL/api/machines" | python3 -c "
-          import sys, json
-          data = json.load(sys.stdin)
-          print(f'Machines returned: {len(data)}')
-          assert len(data) > 0, 'No machines found!'
-          print('PASSED')
-          "

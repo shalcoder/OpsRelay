@@ -3,6 +3,7 @@ OpsRelay Lambda Handler Tests
 Uses moto to mock DynamoDB locally — no real AWS calls.
 """
 import json
+import importlib
 import os
 import pytest
 import boto3
@@ -102,14 +103,14 @@ def make_event(method, path, body=None):
 class TestDashboardEndpoint:
     @mock_aws
     def test_dashboard_returns_200(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/dashboard")
         response = handler(event, {})
         assert response["statusCode"] == 200
 
     @mock_aws
     def test_dashboard_has_machines_and_orders(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/dashboard")
         response = handler(event, {})
         body = json.loads(response["body"])
@@ -119,7 +120,7 @@ class TestDashboardEndpoint:
 
     @mock_aws
     def test_dashboard_kpis_structure(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/dashboard")
         response = handler(event, {})
         kpis = json.loads(response["body"])["kpis"]
@@ -131,7 +132,7 @@ class TestDashboardEndpoint:
 class TestMachinesEndpoint:
     @mock_aws
     def test_list_machines(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/machines")
         response = handler(event, {})
         assert response["statusCode"] == 200
@@ -141,7 +142,7 @@ class TestMachinesEndpoint:
 
     @mock_aws
     def test_get_single_machine(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/machines/M-001")
         response = handler(event, {})
         assert response["statusCode"] == 200
@@ -151,14 +152,14 @@ class TestMachinesEndpoint:
 
     @mock_aws
     def test_machine_not_found(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/machines/NONEXISTENT")
         response = handler(event, {})
         assert response["statusCode"] == 404
 
     @mock_aws
     def test_create_machine(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         new_machine = {
             "machine_id": "M-TEST",
             "name": "Test Machine",
@@ -175,7 +176,7 @@ class TestMachinesEndpoint:
 class TestOrdersEndpoint:
     @mock_aws
     def test_list_orders(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/orders")
         response = handler(event, {})
         assert response["statusCode"] == 200
@@ -184,7 +185,7 @@ class TestOrdersEndpoint:
 
     @mock_aws
     def test_get_single_order(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/orders/ORD-00125")
         response = handler(event, {})
         assert response["statusCode"] == 200
@@ -195,7 +196,7 @@ class TestOrdersEndpoint:
 class TestCorsHeaders:
     @mock_aws
     def test_options_preflight(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("OPTIONS", "/api/dashboard")
         response = handler(event, {})
         assert response["statusCode"] == 200
@@ -203,7 +204,7 @@ class TestCorsHeaders:
 
     @mock_aws
     def test_cors_headers_present(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/machines")
         response = handler(event, {})
         assert "Access-Control-Allow-Origin" in response["headers"]
@@ -212,7 +213,7 @@ class TestCorsHeaders:
 class TestUnknownRoutes:
     @mock_aws
     def test_unknown_route_returns_404(self, dynamodb_tables):
-        from deploy.lambda.lambda_function import handler
+        handler = importlib.import_module("deploy.lambda.lambda_function").handler
         event = make_event("GET", "/api/nonexistent")
         response = handler(event, {})
         assert response["statusCode"] == 404
